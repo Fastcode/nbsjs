@@ -26,7 +26,7 @@ const decoder = new NbsDecoder(['/path/to/file/a.nbs', '/path/to/file/b.nbs', '/
 const types = decoder.getAvailableTypes();
 const firstType = types[0]
 
-// Set the timestmap range (start, end) for the first available type
+// Set the timestamp range for the first available type
 const [start, end] = decoder.getTimestampRange(firstType);
 
 // Get the packet at the given timestamp for the first type
