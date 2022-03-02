@@ -10,8 +10,8 @@
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
     "test": "node tests/test.js",
-    "format": "prettier --write *.js *.d.ts .github/**/*.js tests/*.js",
-    "format:check": "prettier --check *.js *.d.ts .github/**/*.js tests/*.js"
+    "format": "prettier --write \"*.{js,ts,json,md}\" \".github/**/*.{js,yml}\" \"tests/*.js\"",
+    "format:check": "prettier --check \"*.{js,ts,json,md}\" \".github/**/*.{js,yml}\" \"tests/*.js\""
   },
   "repository": {
     "type": "git",
