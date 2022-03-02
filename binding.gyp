@@ -24,13 +24,13 @@
                     'OS=="linux"',
                     {
                         "ccflags": [
-                            "-std=c++17",
+                            "-std=c++14",
                             "-fPIC",
                             "-fext-numeric-literals",
                             "-fexceptions",
                         ],
                         "ccflags!": ["-fno-exceptions"],
-                        "cflags_cc": ["-std=c++17", "-fext-numeric-literals"],
+                        "cflags_cc": ["-std=c++14", "-fext-numeric-literals"],
                         "cflags_cc!": ["-fno-exceptions", "-fno-rtti"],
                     },
                 ],
@@ -38,19 +38,19 @@
                     'OS=="mac"',
                     {
                         "ccflags": [
-                            "-std=c++17",
+                            "-std=c++14",
                             "-fPIC",
                             "-fext-numeric-literals",
                             "-fexceptions",
                         ],
                         "ccflags!": ["-fno-exceptions"],
-                        "cflags_cc": ["-std=c++17", "-fext-numeric-literals"],
+                        "cflags_cc": ["-std=c++14", "-fext-numeric-literals"],
                         "cflags_cc!": ["-fno-exceptions", "-fno-rtti"],
                         "xcode_settings": {
                             "MACOSX_DEPLOYMENT_TARGET": "10.9",
                             "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
                             "GCC_ENABLE_CPP_RTTI": "YES",
-                            "OTHER_CPLUSPLUSFLAGS": ["-std=c++17", "-stdlib=libc++"],
+                            "OTHER_CPLUSPLUSFLAGS": ["-std=c++14", "-stdlib=libc++"],
                             "OTHER_LDFLAGS": ["-stdlib=libc++"],
                         },
                     },
@@ -61,7 +61,7 @@
                         "defines": ["_HAS_EXCEPTIONS=1"],
                         "msvs_settings": {
                             "VCCLCompilerTool": {
-                                "AdditionalOptions": ["-std:c++17"],
+                                "AdditionalOptions": ["-std:c++14"],
                             },
                         },
                     },
