@@ -1,13 +1,13 @@
 /// <reference types="node" />
 
 /**
- * Represents `uint64_t` timestamps in JS using separate `seconds` and `nanoseconds` components
+ * Represents `uint64_t` nanosecond timestamps in JS as an object with separate `seconds` and `nanoseconds` components
  */
 export interface NbsTimestamp {
   /** The seconds component of this timestamp */
   seconds: number;
 
-  /** The nano seconds component of this timestamp */
+  /** The nanoseconds component of this timestamp */
   nanos: number;
 }
 
@@ -24,7 +24,7 @@ export interface NbsPacket {
   /** The packet subtype */
   subtype: number;
 
-  /** The packet data. Only available for non-empty packets. */
+  /** The packet data, undefined for empty packets */
   payload?: Buffer;
 }
 
@@ -37,13 +37,13 @@ export interface NbsTypeSubtype {
 }
 
 /**
- * A decoder that can be used to read packets from NBS files.
+ * A decoder that can be used to read packets from NBS files
  */
 export declare class NbsDecoder {
   /**
-   * Create a new NbsDecoder instance.
+   * Create a new NbsDecoder instance
    *
-   * @param paths List of absolute paths of nbs files to decode
+   * @param paths A list of absolute paths of nbs files to decode
    * @throws For an empty list of paths, and for paths that don't exist
    */
   public constructor(paths: string[]);
@@ -57,32 +57,32 @@ export declare class NbsDecoder {
   /**
    * Get the timestamp range (start, end) for all packets of the given type in the loaded nbs files
    *
-   * @param type A `{type, subtype}` object to get the timestamp range for
+   * @param type A type subtype object to get the timestamp range for
    */
   public getTimestampRange(type: NbsTypeSubtype): [NbsTimestamp, NbsTimestamp];
 
   /**
-   * Get the packets at or before the given timestamp for all types in the loaded nbs files.
+   * Get the packets at or before the given timestamp for all types in the loaded nbs files
    *
-   * Will return a list with one packet for each available type in the loaded nbs files.
+   * Returns a list with one packet for each available type in the loaded nbs files.
    * Empty packets (where `.payload` is undefined) will be returned for types that don't exist
    * for the given timestamp in the loaded nbs files. Empty packets will have their `timestamp`,
-   * `type`, and `subtype` set to the the corresponding arguments passed to this function.
+   * `type`, and `subtype` set to the corresponding arguments passed to this function.
    *
    * @param timestamp The timestamp to get packets at
    */
   public getPackets(timestamp: number | BigInt | NbsTimestamp): NbsPacket[];
 
   /**
-   * Get the packets at or before the given timestamp for the given types in the loaded nbs files.
+   * Get the packets at or before the given timestamp for the given types in the loaded nbs files
    *
-   * Will return a list of length n for n types, one packet for each requested type.
+   * Returns a list of length N for the given list of N types, one packet for each requested type.
    * Empty packets (where `.payload` is undefined) will be returned for types that don't exist
    * for the given timestamp in the loaded nbs files. Empty packets will have their `timestamp`,
-   * `type`, and `subtype` set to the the corresponding arguments passed to this function.
+   * `type`, and `subtype` set to the corresponding arguments passed to this function.
    *
    * @param timestamp The timestamp to get packets at
-   * @param types A list of `{type, subtype}` objects to get packets for
+   * @param types A list of type subtype objects to get packets for
    */
   public getPackets(
     timestamp: number | BigInt | NbsTimestamp,
