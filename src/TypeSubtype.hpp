@@ -15,7 +15,7 @@ namespace nbs {
     // Compares two TypeSubtype objects for ordering using <
     inline bool operator<(const TypeSubtype& lhs, const TypeSubtype& rhs) {
         return (lhs.type < rhs.type) || ((lhs.type == rhs.type) && (lhs.subtype < rhs.subtype));
-    };
+    }
 }  // namespace nbs
 
 #endif  // NBS_TYPESUBTYPE_HPP
