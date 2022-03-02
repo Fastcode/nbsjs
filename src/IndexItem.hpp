@@ -24,16 +24,16 @@ namespace nbs {
         /// The offset of the message from the start of the file
         uint64_t offset;
 
-        /// The length of the packet (including the header)
+        /// The length of the packet in bytes (including the header)
         uint32_t length;
     };
 #pragma pack(pop)
 
     struct IndexItemFile {
-        /// The index item.
+        /// The index item
         IndexItem item;
 
-        /// When we are opening multiple nbs files at once, this indicates which file it is from.
+        /// When multiple nbs files are loaded, this indicates which file the index item is from.
         /// It's the index of the file in the list of files that were passed for opening.
         int fileno;
     };

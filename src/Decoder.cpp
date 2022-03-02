@@ -5,11 +5,12 @@
 
 #include "IndexItem.hpp"
 #include "Packet.hpp"
+#include "TypeSubtype.hpp"
 #include "xxhash/xxhash.h"
 
 namespace nbs {
 
-    Napi::Object Decoder::Init(Napi::Env env, Napi::Object exports) {
+    Napi::Object Decoder::Init(Napi::Env& env, Napi::Object& exports) {
         Napi::Function func =
             DefineClass(env,
                         "Decoder",
@@ -53,7 +54,7 @@ namespace nbs {
 
         // Validate the `paths` argument
         if (info.Length() == 0) {
-            Napi::TypeError::New(env, "missing `paths` argument: provide an array of nbs file paths")
+            Napi::TypeError::New(env, "missing argument `paths`: provide an array of nbs file paths")
                 .ThrowAsJavaScriptException();
             return;
         }
@@ -111,8 +112,8 @@ namespace nbs {
         for (size_t i = 0; i < availableTypes.size(); i++) {
             auto jsType = Napi::Object::New(env);
 
-            jsType.Set("type", this->HashToJsValue(availableTypes[i].first, env));
-            jsType.Set("subtype", Napi::Number::New(env, availableTypes[i].second));
+            jsType.Set("type", this->HashToJsValue(availableTypes[i].type, env));
+            jsType.Set("subtype", Napi::Number::New(env, availableTypes[i].subtype));
 
             jsTypes[i] = jsType;
         }
@@ -163,7 +164,7 @@ namespace nbs {
             return env.Undefined();
         }
 
-        std::vector<std::pair<uint64_t, uint32_t>> types;
+        std::vector<TypeSubtype> types;
 
         if (info[1].IsArray()) {
             auto argTypes = info[1].As<Napi::Array>();
@@ -203,11 +204,11 @@ namespace nbs {
             jsPacket.Set("type", HashToJsValue(packets[i].type, env));
             jsPacket.Set("subtype", Napi::Number::New(env, packets[i].subtype));
 
-            if (packets[i].payload != nullptr) {
-                jsPacket.Set("payload", Napi::Buffer<uint8_t>::Copy(env, packets[i].payload, packets[i].length));
+            if (packets[i].payload == nullptr) {
+                jsPacket.Set("payload", env.Undefined());
             }
             else {
-                jsPacket.Set("payload", env.Undefined());
+                jsPacket.Set("payload", Napi::Buffer<uint8_t>::Copy(env, packets[i].payload, packets[i].length));
             }
 
             jsPackets[i] = jsPacket;
@@ -216,8 +217,7 @@ namespace nbs {
         return jsPackets;
     }
 
-    std::vector<Packet> Decoder::GetMatchingPackets(uint64_t timestamp,
-                                                    const std::vector<std::pair<uint64_t, uint32_t>>& types) {
+    std::vector<Packet> Decoder::GetMatchingPackets(const uint64_t& timestamp, const std::vector<TypeSubtype>& types) {
         std::vector<Packet> packets;
 
         auto matchingIndexItems = this->index.getIteratorsForTypes(types);
@@ -274,17 +274,17 @@ namespace nbs {
         return packet;
     }
 
-    uint64_t Decoder::HashFromJsValue(const Napi::Value& jsType, const Napi::Env& env) {
+    uint64_t Decoder::HashFromJsValue(const Napi::Value& jsHash, const Napi::Env& env) {
         uint64_t hash = 0;
 
         // If we have a string, apply XXHash to get the hash
-        if (jsType.IsString()) {
-            std::string s = jsType.As<Napi::String>().Utf8Value();
+        if (jsHash.IsString()) {
+            std::string s = jsHash.As<Napi::String>().Utf8Value();
             hash          = XXH64(s.c_str(), s.size(), 0x4e55436c);
         }
         // Otherwise try to interpret it as a buffer that contains the hash
-        else if (jsType.IsTypedArray()) {
-            Napi::TypedArray typedArray = jsType.As<Napi::TypedArray>();
+        else if (jsHash.IsTypedArray()) {
+            Napi::TypedArray typedArray = jsHash.As<Napi::TypedArray>();
             Napi::ArrayBuffer buffer    = typedArray.ArrayBuffer();
 
             uint8_t* data  = reinterpret_cast<uint8_t*>(buffer.Data());
@@ -305,17 +305,17 @@ namespace nbs {
         return hash;
     }
 
-    Napi::Value Decoder::HashToJsValue(const uint64_t& type, const Napi::Env& env) {
-        return Napi::Buffer<uint8_t>::Copy(env, reinterpret_cast<const uint8_t*>(&type), sizeof(uint64_t))
+    Napi::Value Decoder::HashToJsValue(const uint64_t& hash, const Napi::Env& env) {
+        return Napi::Buffer<uint8_t>::Copy(env, reinterpret_cast<const uint8_t*>(&hash), sizeof(uint64_t))
             .As<Napi::Value>();
     }
 
-    std::pair<uint64_t, uint32_t> Decoder::TypeSubtypeFromJsValue(const Napi::Value& jsValue, const Napi::Env& env) {
-        if (!jsValue.IsObject()) {
+    TypeSubtype Decoder::TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env) {
+        if (!jsTypeSubtype.IsObject()) {
             throw std::runtime_error("expected object");
         }
 
-        auto typeSubtype = jsValue.As<Napi::Object>();
+        auto typeSubtype = jsTypeSubtype.As<Napi::Object>();
 
         if (!typeSubtype.Has("type") || !typeSubtype.Has("subtype")) {
             throw std::runtime_error("expected object with `type` and `subtype` keys");
@@ -342,18 +342,18 @@ namespace nbs {
         return {type, subtype};
     }
 
-    uint64_t Decoder::TimestampFromJsValue(const Napi::Value& jsValue, const Napi::Env& env) {
+    uint64_t Decoder::TimestampFromJsValue(const Napi::Value& jsTimestamp, const Napi::Env& env) {
         uint64_t timestamp = 0;
 
-        if (jsValue.IsNumber()) {
-            timestamp = jsValue.As<Napi::Number>().Int64Value();
+        if (jsTimestamp.IsNumber()) {
+            timestamp = jsTimestamp.As<Napi::Number>().Int64Value();
         }
-        else if (jsValue.IsBigInt()) {
+        else if (jsTimestamp.IsBigInt()) {
             bool lossless = true;
-            timestamp     = jsValue.As<Napi::BigInt>().Uint64Value(&lossless);
+            timestamp     = jsTimestamp.As<Napi::BigInt>().Uint64Value(&lossless);
         }
-        else if (jsValue.IsObject()) {
-            auto ts = jsValue.As<Napi::Object>();
+        else if (jsTimestamp.IsObject()) {
+            auto ts = jsTimestamp.As<Napi::Object>();
 
             if (!ts.Has("seconds") || !ts.Has("nanos")) {
                 throw std::runtime_error("expected object with `seconds` and `nanos` keys");
@@ -376,10 +376,10 @@ namespace nbs {
     }
 
     Napi::Value Decoder::TimestampToJsValue(const uint64_t& timestamp, const Napi::Env& env) {
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("seconds", Napi::Number::New(env, timestamp / 1000000000L));
-        obj.Set("nanos", Napi::Number::New(env, timestamp % 1000000000L));
-        return obj;
+        Napi::Object jsTimestamp = Napi::Object::New(env);
+        jsTimestamp.Set("seconds", Napi::Number::New(env, timestamp / 1000000000L));
+        jsTimestamp.Set("nanos", Napi::Number::New(env, timestamp % 1000000000L));
+        return jsTimestamp;
     }
 
 }  // namespace nbs

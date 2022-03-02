@@ -50,7 +50,7 @@ test('NbsDecoder constructor throws for invalid arguments', () => {
     () => {
       new NbsDecoder();
     },
-    /missing `paths` argument: provide an array of nbs file paths/,
+    /missing argument `paths`: provide an array of nbs file paths/,
     'NbsDecoder() constructor throws without path argument'
   );
 
