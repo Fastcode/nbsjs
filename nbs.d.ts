@@ -37,6 +37,14 @@ export interface NbsTypeSubtype {
 }
 
 /**
+ * A (type, subtype) pair that uniquely identifies a specific type of message,
+ * where the type is always a Buffer
+ */
+ export interface NbsTypeSubtypeBuffer extends NbsTypeSubtype {
+  type: Buffer
+}
+
+/**
  * A decoder that can be used to read packets from NBS files
  */
 export declare class NbsDecoder {
@@ -49,7 +57,7 @@ export declare class NbsDecoder {
   public constructor(paths: string[]);
 
   /** Get a list of all the types present in the loaded nbs files */
-  public getAvailableTypes(): NbsTypeSubtype[];
+  public getAvailableTypes(): NbsTypeSubtypeBuffer[];
 
   /** Get the timestamp range (start, end) across all packets in the loaded nbs files */
   public getTimestampRange(): [NbsTimestamp, NbsTimestamp];
