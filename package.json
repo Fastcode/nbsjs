@@ -1,0 +1,46 @@
+{
+  "name": "nbsjs",
+  "version": "0.1.0",
+  "description": "Node.js module for interacting with NUClear Binary Stream files",
+  "main": "nbs.js",
+  "types": "nbs.d.ts",
+  "engines": {
+    "node": "~10 >=10.20 || >=12.17"
+  },
+  "scripts": {
+    "build": "node-gyp configure && node-gyp build",
+    "test": "node tests/test.js",
+    "format": "prettier --write *.js *.d.ts .github/**/*.js tests/*.js",
+    "format:check": "prettier --check *.js *.d.ts .github/**/*.js tests/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fastcode/nbsjs.git"
+  },
+  "keywords": [
+    "NUClear",
+    "NUClear Binary Stream",
+    "nbs"
+  ],
+  "author": "Josephus Paye II <j.paye96@gmail.com> (https://github.com/JosephusPaye), Trent Houliston <trent@houliston.me> (https://github.com/TrentHouliston/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Fastcode/nbsjs/issues"
+  },
+  "homepage": "https://github.com/Fastcode/nbsjs#readme",
+  "gypfile": true,
+  "devDependencies": {
+    "prettier": "^2.5.1",
+    "uvu": "^0.5.3"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^4.3.0"
+  },
+  "prettier": {
+    "semi": true,
+    "printWidth": 100,
+    "singleQuote": true,
+    "tabWidth": 2
+  }
+}
