@@ -42,4 +42,4 @@ console.log({ types, firstType, start, end, packets });
 
 ## API
 
-See [`nbs.d.ts`](./nbs.d.ts) for API and types.
+See [`nbsdecoder.d.ts`](./nbsdecoder.d.ts) for API and types.
