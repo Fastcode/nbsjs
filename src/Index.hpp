@@ -12,7 +12,6 @@
 
 namespace nbs {
 
-
     class Index {
     public:
         /// Empty default constructor
@@ -36,7 +35,7 @@ namespace nbs {
                 }
 
                 // Load the index file
-                zstr::ifstream input(idxPath);
+                zstr::ifstream input(idxPath, zstr::ifstream::binary);
 
                 // Read the index items from the file
                 while (input.good()) {
