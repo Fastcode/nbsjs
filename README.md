@@ -1,6 +1,6 @@
-# nbsjs
+# nbsdecoder.js
 
-[![Node.js CI](https://github.com/Fastcode/nbsjs/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Fastcode/nbsjs/actions/workflows/node.js.yml)
+[![Node.js CI](https://github.com/Fastcode/nbsdecoder.js/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Fastcode/nbsdecoder.js/actions/workflows/node.js.yml)
 
 Node.js module for interacting with [NUClear Binary Stream](https://nubook.nubots.net/system/foundations/nuclear#nbs-files) files.
 
@@ -9,7 +9,7 @@ Node.js module for interacting with [NUClear Binary Stream](https://nubook.nubot
 The package contains a native module, so you'll need a working C++ compiler on your system to install and build it.
 
 ```
-npm install nbsjs --save
+npm install nbsdecoder.js --save
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ npm install nbsjs --save
 The following example shows a typical usage pattern of creating a decoder with nbs file paths, and reading types, timestamps, and data packets.
 
 ```js
-const { NbsDecoder } = require('nbsjs');
+const { NbsDecoder } = require('nbsdecoder.js');
 
 // Create a decoder instance
 const decoder = new NbsDecoder([

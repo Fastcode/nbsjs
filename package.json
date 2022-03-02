@@ -1,15 +1,15 @@
 {
-  "name": "nbsjs",
+  "name": "nbsdecoder.js",
   "version": "0.1.0",
   "description": "Node.js module for interacting with NUClear Binary Stream files",
-  "main": "nbs.js",
-  "types": "nbs.d.ts",
+  "main": "nbsdecoder.js",
+  "types": "nbsdecoder.d.ts",
   "engines": {
     "node": "~10 >=10.20 || >=12.17"
   },
   "files": [
-    "nbs.js",
-    "nbs.d.ts",
+    "nbsdecoder.js",
+    "nbsdecoder.d.ts",
     "src",
     "binding.gyp"
   ],
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Fastcode/nbsjs.git"
+    "url": "git+https://github.com/Fastcode/nbsdecoder.js.git"
   },
   "keywords": [
     "NUClear",
@@ -31,9 +31,9 @@
   "author": "Josephus Paye II <j.paye96@gmail.com> (https://github.com/JosephusPaye), Trent Houliston <trent@houliston.me> (https://github.com/TrentHouliston/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Fastcode/nbsjs/issues"
+    "url": "https://github.com/Fastcode/nbsdecoder.js/issues"
   },
-  "homepage": "https://github.com/Fastcode/nbsjs#readme",
+  "homepage": "https://github.com/Fastcode/nbsdecoder.js#readme",
   "gypfile": true,
   "devDependencies": {
     "prettier": "^2.5.1",
