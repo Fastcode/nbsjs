@@ -1,12 +1,6 @@
 #ifndef NBS_INDEX_HPP
 #define NBS_INDEX_HPP
 
-// Remove an ancient max() macro on Windows that messes up std::max()
-// See https://stackoverflow.com/a/6884102
-#ifdef _WIN32
-    #undef max
-#endif
-
 #include <iostream>
 #include <map>
 #include <sys/stat.h>
@@ -119,7 +113,9 @@ namespace nbs {
 
         /// Get the first and last timestamps across all items in the index
         std::pair<uint64_t, uint64_t> getTimestampRange() {
-            std::pair<uint64_t, uint64_t> range{std::numeric_limits<uint64_t>::max(), 0};
+            // std::numeric_limits<uint64_t>::max is wrapped in () here to workaround an issue on Windows
+            // See https://stackoverflow.com/a/27443191
+            std::pair<uint64_t, uint64_t> range{(std::numeric_limits<uint64_t>::max)(), 0};
 
             for (auto& mapEntry : this->typeMap) {
                 const IndexItem& firstItem = mapEntry.second.first->item;
