@@ -1,7 +1,12 @@
 #ifndef NBS_INDEX_HPP
 #define NBS_INDEX_HPP
 
-#include <filesystem>
+// Remove an ancient max() macro on Windows that messes up std::max()
+// See https://stackoverflow.com/a/6884102
+#ifdef _WIN32
+    #undef max
+#endif
+
 #include <iostream>
 #include <map>
 #include <sys/stat.h>

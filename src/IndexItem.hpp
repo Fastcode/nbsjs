@@ -2,7 +2,6 @@
 #define NBS_INDEXITEM_HPP
 
 #include <cstdint>
-#include <filesystem>
 #include <fstream>
 #include <vector>
 
