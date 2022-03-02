@@ -316,6 +316,25 @@ test('NbsDecoder.getPackets() returns packets of the given types at the given ti
   assert.equal(packets.length, 2, 'two types were requested, so two packets are returned');
 });
 
+test('NbsDecoder.getPackets() allows for specifying types using a string of the message name', () => {
+  const knownStartTime = {
+    seconds: 1000,
+    nanos: 0,
+  };
+
+  const packetsFromTypeBuffer = decoder.getPackets(knownStartTime, [
+    { type: pingType, subtype: 0 },
+    { type: pongType, subtype: 0 },
+  ]);
+
+  const packetsFromTypeString = decoder.getPackets(knownStartTime, [
+    { type: 'message.Ping', subtype: 0 },
+    { type: 'message.Pong', subtype: 0 },
+  ]);
+
+  assert.equal(packetsFromTypeBuffer, packetsFromTypeString);
+});
+
 test('NbsDecoder.getPackets() returned packets are at or before the given timestamp', () => {
   const [start, end] = decoder.getTimestampRange();
 
