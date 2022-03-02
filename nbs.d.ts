@@ -40,8 +40,8 @@ export interface NbsTypeSubtype {
  * A (type, subtype) pair that uniquely identifies a specific type of message,
  * where the type is always a Buffer
  */
- export interface NbsTypeSubtypeBuffer extends NbsTypeSubtype {
-  type: Buffer
+export interface NbsTypeSubtypeBuffer extends NbsTypeSubtype {
+  type: Buffer;
 }
 
 /**

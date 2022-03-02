@@ -1,9 +1,9 @@
 #ifndef NBS_INDEX_HPP
 #define NBS_INDEX_HPP
 
-#include <filesystem>
 #include <iostream>
 #include <map>
+#include <sys/stat.h>
 #include <vector>
 
 #include "IndexItem.hpp"
@@ -11,6 +11,7 @@
 #include "zstr/zstr.hpp"
 
 namespace nbs {
+
     class Index {
     public:
         /// Empty default constructor
@@ -24,17 +25,17 @@ namespace nbs {
         template <typename T>
         Index(const T& paths) {
             for (size_t i = 0; i < paths.size(); i++) {
-                auto& nbsPath                 = paths[i];
-                std::filesystem::path idxPath = nbsPath + ".idx";
+                auto& nbsPath       = paths[i];
+                std::string idxPath = nbsPath + ".idx";
 
                 // Currently we only handle nbs files that have an index file
                 // If there's no index file, throw
-                if (!std::filesystem::exists(idxPath)) {
+                if (!this->fileExists(idxPath)) {
                     throw std::runtime_error("nbs index not found for file: " + nbsPath);
                 }
 
                 // Load the index file
-                zstr::ifstream input(idxPath.string());
+                zstr::ifstream input(idxPath, zstr::ifstream::binary);
 
                 // Read the index items from the file
                 while (input.good()) {
@@ -111,7 +112,9 @@ namespace nbs {
 
         /// Get the first and last timestamps across all items in the index
         std::pair<uint64_t, uint64_t> getTimestampRange() {
-            std::pair<uint64_t, uint64_t> range{std::numeric_limits<uint64_t>::max(), 0};
+            // std::numeric_limits<uint64_t>::max is wrapped in () here to workaround an issue on Windows
+            // See https://stackoverflow.com/a/27443191
+            std::pair<uint64_t, uint64_t> range{(std::numeric_limits<uint64_t>::max)(), 0};
 
             for (auto& mapEntry : this->typeMap) {
                 const IndexItem& firstItem = mapEntry.second.first->item;
@@ -150,6 +153,13 @@ namespace nbs {
         /// Maps a (type, subtype) to the iterator over the index items for that type and subtype
         std::map<TypeSubtype, std::pair<std::vector<IndexItemFile>::iterator, std::vector<IndexItemFile>::iterator>>
             typeMap;
+
+        /// Check if a file exists at the given path
+        bool fileExists(const std::string& path) {
+            // Shamelessly stolen from: http://stackoverflow.com/a/12774387/1387006
+            struct stat buffer {};
+            return (stat(path.c_str(), &buffer) == 0);
+        }
     };
 
 }  // namespace nbs

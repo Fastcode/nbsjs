@@ -20,20 +20,24 @@ The following example shows a typical usage pattern of creating a decoder with n
 const { NbsDecoder } = require('nbsjs');
 
 // Create a decoder instance
-const decoder = new NbsDecoder(['/path/to/file/a.nbs', '/path/to/file/b.nbs', '/path/to/file/c.nbs']);
+const decoder = new NbsDecoder([
+  '/path/to/file/a.nbs',
+  '/path/to/file/b.nbs',
+  '/path/to/file/c.nbs',
+]);
 
 // Get a list of all types present in the NBS files, and get the first type
 const types = decoder.getAvailableTypes();
-const firstType = types[0]
+const firstType = types[0];
 
 // Set the timestamp range for the first available type
 const [start, end] = decoder.getTimestampRange(firstType);
 
 // Get the packet at the given timestamp for the first type
-const packets = decoder.getPackets(start, [firstType])
+const packets = decoder.getPackets(start, [firstType]);
 
 // Log all the values for inspection
-console.log({ types, firstType, start, end, packets })
+console.log({ types, firstType, start, end, packets });
 ```
 
 ## API
