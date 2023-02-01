@@ -438,4 +438,101 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
   });
 });
 
+/* Test One: Check step = 0 and the returned frame is the same as input. */ 
+test('NbsDecoder.stepFrame() outputs the exact same timestamp as input given steps = 0', () => {
+  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
+  const new_timestamp = decoder.stepFrame(start, { type: pingType, subtype: 0 } , 0, false);
+
+    assert.equal(
+      tsToBigInt(new_timestamp), tsToBigInt(start),
+      'With steps = 0, input start timestamp should be equal to the returned timestamp'
+    )
+}); 
+
+/* Test Two: Check stepping forward returns a timestamp which is greater than start. */ 
+test('NbsDecoder.stepFrame() returns a timestamp greater than input', () => {
+  //  
+  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
+  const new_timestamp = decoder.stepFrame(start, { type: pingType, subtype: 0} , 1, true);
+
+  assert.ok(
+   tsToBigInt(new_timestamp) > tsToBigInt(start),
+   'The new return Nbs timestamp is greater than the input timestamp'
+ );
+});
+
+/* Test Three: Check +2 steps returns the correct timestamp: 1634090013210511360. */
+test("NbsDecoder.stepFrame() Check step = 2 -> steps correctly 2 frames forward", () => {
+  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
+  const new_timestamp = decoder.stepFrame(start, { type: pingType, subtype: 0 }, 2, true);
+  
+  const twoFramesAhead = { seconds: 1006, nanos: 0 }
+    assert.equal(
+      tsToBigInt(new_timestamp), tsToBigInt(twoFramesAhead)
+    )
+});
+
+/* Test Four: Check varying input types for timestamp work correctly. */
+test('NbsDecoder.stepFrame()) accepts `number`, `BigInt` or `{ seconds, nanos }` for timestamp argument', () => {
+  const packetsFromNumber = decoder.stepFrame((1500 * 1e9), { type: pingType, subtype: 0 }, 1, true);
+  const packetsFromBigInt = decoder.stepFrame((1500 * 1e9), { type: pingType, subtype: 0 }, 1, true);
+  const packetsFromTimestampObject = decoder.stepFrame((1500 * 1e9), { type: pingType, subtype: 0 }, 1, true);
+
+  assert.equal(packetsFromNumber, packetsFromBigInt);
+  assert.equal(packetsFromNumber, packetsFromTimestampObject);
+});
+
+/* Test Five: Check stepping backwards by 1 from the end timestamp is correct. */
+test('NbsDecoder.stepFrame()) Steps backwards by 1 frame', () => {
+  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 }); 
+  const new_timestamp = decoder.stepFrame(end, { type: pingType, subtype: 0 }, 1, false);
+
+  assert.ok(
+    tsToBigInt(new_timestamp) < tsToBigInt(end), 'New timestamp is less than input timestamp'
+  )
+
+  assert.equal(
+    tsToBigInt(new_timestamp), tsToBigInt({ seconds: 1894, nanos: 0 }),
+    'New timestamp is equal to pre-determined second last timestamp in index'
+  )
+});
+
+/* Test Six: Check stepping backwards by 1 from the end timestamp is correct. */
+test('NbsDecoder.stepFrame() Step backwards by 2 frames', () => {
+  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 }); 
+  const new_timestamp = decoder.stepFrame((end ), { type: pingType, subtype: 0 }, 2, false);
+  
+  assert.equal(
+    tsToBigInt(new_timestamp), tsToBigInt({ seconds: 1891, nanos: 0 }),
+    'New timestamp is equal to pre-determined second last timestamp in index'
+  )
+})
+
+/* Test Seven: Error checking. */
+test('NbsDecoder.stepFrame() Throws error on missing or incorrect inputs.', () => {
+  assert.throws(
+    () => {
+      decoder.stepFrame();
+    },
+    /invalid type for argument `timestamp`: expected positive number or BigInt/,
+    'NbsDecoder.stepFrame() throws for missing `timestamp` argument'
+  );
+
+  assert.throws(
+    () => {
+      decoder.stepFrame("(1500 * 1e9)");
+    },
+    /invalid type for argument `timestamp`: expected positive number or BigInt/,
+    'NbsDecoder.stepFrame() throws for missing `timestamp` argument'
+  );
+  
+  assert.throws(
+    () => {
+      decoder.stepFrame(0, { type: pingType, subtype: "0" });
+    },
+    /invalid type for argument `typeSubtype`: invalid `.subtype`: expected number/,
+    'NbsDecoder.stepFrame() throws for object with invalid `subtype`'
+  );
+})
+
 test.run();

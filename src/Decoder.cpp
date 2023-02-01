@@ -24,6 +24,9 @@ namespace nbs {
                             InstanceMethod<&Decoder::GetPackets>(
                                 "getPackets",
                                 static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
+                            InstanceMethod<&Decoder::StepFrame>(
+                                "stepFrame", 
+                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
                         });
 
         Napi::FunctionReference* constructor = new Napi::FunctionReference();
@@ -148,6 +151,48 @@ namespace nbs {
         jsRange[i + 1] = this->TimestampToJsValue(range.second, env);
 
         return jsRange;
+    }
+
+    Napi::Value Decoder::StepFrame(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env(); 
+
+        uint64_t steps;
+        bool flag = true; 
+
+        uint64_t timestamp = 0;
+        try {
+            timestamp = this->TimestampFromJsValue(info[0], env);
+        }
+        catch (const std::exception& ex) {
+            Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what()).ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+
+        nbs::TypeSubtype typeSubtype;
+        try {
+            typeSubtype = this->TypeSubtypeFromJsValue(info[1], env); 
+        }
+        catch (const std::exception& ex) {
+            Napi::TypeError::New(env, std::string("invalid type for argument `typeSubtype`: invalid `.subtype`: expected number") + ex.what())
+            .ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+
+        try  {
+            steps = info[2].As<Napi::Number>().Int64Value();
+        } catch (const std::exception& ex) {
+            Napi::TypeError::New(env, std::string("invalid step input") + ex.what()).ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+
+        flag = info[3].As<Napi::Boolean>();
+
+        // Sort and step(+-) index to find the new timestamp.
+        auto index_timestamp = this->index.stepFrame(timestamp, typeSubtype, steps, flag); 
+
+        // Convert timestamp back to Napi format and return.
+        auto new_timestamp = this->TimestampToJsValue(index_timestamp, env).As<Napi::Number>(); 
+        return new_timestamp;
     }
 
     Napi::Value Decoder::GetPackets(const Napi::CallbackInfo& info) {

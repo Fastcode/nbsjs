@@ -110,6 +110,50 @@ namespace nbs {
             return types;
         }
 
+        // Input = timestamp, cameraType: TypeSubtype, steps, flag.  
+        std::uint64_t stepFrame(const uint64_t& timestamp, const TypeSubtype& type, const uint32_t& steps, const bool& stepForwardFlag) {
+
+            // Get iterator pair for individual input camera type. 
+            auto iteratorPair = this->getIteratorForType(type);   
+
+            auto& begin = iteratorPair.first;
+            auto& end = iteratorPair.second;
+
+            // Used to store input timestamp. 
+            IndexItemFile comparisonValue; 
+            comparisonValue.item.timestamp = timestamp;
+
+            // Use input timestamp and iterators to find index. Find the first item with a timestamp greater than or equal to the requested timestamp
+            auto found = std::upper_bound(begin, end, comparisonValue, [](const IndexItemFile& a, const IndexItemFile& b) {
+                return a.item.timestamp < b.item.timestamp;
+            });
+
+            // Upper bound will get the next timestamp greater than input. If steps > 1 use input steps otherwise use timestamp from found (which is +1 above index).
+            if (steps == 0) {
+                return timestamp;
+                }
+
+            if (stepForwardFlag) {
+                if (steps == 1) {
+                    return found->item.timestamp;
+                }
+                else {
+                    auto newIndex = *std::next(found, (steps-1));  // Because found is +1 from input index, -1 to step amount.
+                    return newIndex.item.timestamp;
+                }
+
+            } else {
+                if (steps == 1) {
+                    auto newIndex = *std::prev(found, (steps+1));  // Because found is +1 from input index, +1 to amount to steps backwards.
+                    return newIndex.item.timestamp;
+                }
+                else {
+                    auto newIndex = *std::prev(found, (steps+1)); 
+                    return newIndex.item.timestamp;
+                }
+            }
+        }
+
         /// Get the first and last timestamps across all items in the index
         std::pair<uint64_t, uint64_t> getTimestampRange() {
             // std::numeric_limits<uint64_t>::max is wrapped in () here to workaround an issue on Windows
