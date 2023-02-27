@@ -24,8 +24,8 @@ namespace nbs {
                             InstanceMethod<&Decoder::GetPackets>(
                                 "getPackets",
                                 static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Decoder::StepFrame>(
-                                "stepFrame", 
+                            InstanceMethod<&Decoder::NextTimestamp>(
+                                "nextTimestamp",
                                 static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
                         });
 
@@ -153,45 +153,75 @@ namespace nbs {
         return jsRange;
     }
 
-    Napi::Value Decoder::StepFrame(const Napi::CallbackInfo& info) {
-        Napi::Env env = info.Env(); 
-
-        uint64_t steps;
-        bool flag = true; 
+    Napi::Value Decoder::NextTimestamp(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env();
 
         uint64_t timestamp = 0;
         try {
             timestamp = this->TimestampFromJsValue(info[0], env);
         }
         catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what()).ThrowAsJavaScriptException();
+            Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
+                .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
-        nbs::TypeSubtype typeSubtype;
+        int steps;
         try {
-            typeSubtype = this->TypeSubtypeFromJsValue(info[1], env); 
+            steps = info[2].As<Napi::Number>().Int64Value();
         }
         catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid type for argument `typeSubtype`: invalid `.subtype`: expected number") + ex.what())
-            .ThrowAsJavaScriptException();
+            Napi::TypeError::New(env, std::string("invalid step input. A number was expected.") + ex.what())
+                .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
-        try  {
-            steps = info[2].As<Napi::Number>().Int64Value();
-        } catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid step input") + ex.what()).ThrowAsJavaScriptException();
-            return env.Undefined();
+        // Array of typeSubtypes
+        std::vector<TypeSubtype> types;
+        if (info[1].IsArray()) {
+            auto argTypes = info[1].As<Napi::Array>();
+
+            // Get the types and subtypes
+            for (std::size_t i = 0; i < argTypes.Length(); i++) {
+                auto item = argTypes.Get(i);
+
+                try {
+                    auto typeSubtype = this->TypeSubtypeFromJsValue(item, env);
+                    types.push_back(typeSubtype);
+                }
+
+                catch (const std::exception& ex) {
+                    Napi::TypeError::New(env, "invalid item type in `types` array: " + std::string(ex.what()))
+                        .ThrowAsJavaScriptException();
+                    return env.Undefined();
+                }
+            }
+        }
+        else if (info[1].IsUndefined()) {
+            types = this->index.getTypes();
         }
 
-        flag = info[3].As<Napi::Boolean>();
+        // Single type
+        else {
+            try {
+                types.push_back(this->TypeSubtypeFromJsValue(info[1], env));
+            }
+            catch (const std::exception& ex) {
+                Napi::TypeError::New(
+                    env,
+                    std::string("invalid type for argument `typeSubtype`: invalid `.subtype`: expected number")
+                        + ex.what())
+                    .ThrowAsJavaScriptException();
+                return env.Undefined();
+            }
+        }
+
 
         // Sort and step(+-) index to find the new timestamp.
-        auto index_timestamp = this->index.stepFrame(timestamp, typeSubtype, steps, flag); 
+        auto index_timestamp = this->index.nextTimestamp(timestamp, types, steps);
 
         // Convert timestamp back to Napi format and return.
-        auto new_timestamp = this->TimestampToJsValue(index_timestamp, env).As<Napi::Number>(); 
+        auto new_timestamp = this->TimestampToJsValue(index_timestamp, env).As<Napi::Number>();
         return new_timestamp;
     }
 
@@ -274,7 +304,7 @@ namespace nbs {
             IndexItemFile compValue;
             compValue.item.timestamp = timestamp;
 
-            // Find the first item with a timestamp greater than or equal to the requested timestamp
+            // Find the first item with a timestamp strictly greater than timestamp
             auto found = std::upper_bound(begin, end, compValue, [](const IndexItemFile& a, const IndexItemFile& b) {
                 return a.item.timestamp < b.item.timestamp;
             });

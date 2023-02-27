@@ -1,8 +1,8 @@
+const { on } = require('events');
 const fs = require('fs');
 const path = require('path');
 const { test } = require('uvu');
 const assert = require('uvu/assert');
-
 const { NbsDecoder } = require('..');
 
 /** Convert the given timestamp object to a BigInt of nanoseconds */
@@ -438,101 +438,108 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
   });
 });
 
-/* Test One: Check step = 0 and the returned frame is the same as input. */ 
-test('NbsDecoder.stepFrame() outputs the exact same timestamp as input given steps = 0', () => {
+const testArray = [{type: pingType, subtype: 0}, {type: pongType, subtype: 0}, {type: pangType, subtype: 100}, {type: pangType, subtype: 200}];
+
+/* Check step = 0 and the returned frame is the same as input. */
+test('NbsDecoder.nextTimestamp() outputs the exact same timestamp as input given steps = 0', () => {
   const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
-  const new_timestamp = decoder.stepFrame(start, { type: pingType, subtype: 0 } , 0, false);
+  const new_timestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0} , 0);
 
     assert.equal(
       tsToBigInt(new_timestamp), tsToBigInt(start),
-      'With steps = 0, input start timestamp should be equal to the returned timestamp'
+      'With steps = 0, input start timestamp should be equal to the returned timestamp for single type'
     )
-}); 
 
-/* Test Two: Check stepping forward returns a timestamp which is greater than start. */ 
-test('NbsDecoder.stepFrame() returns a timestamp greater than input', () => {
-  //  
+});
+
+/* Check stepping forward by one timestamp returns a timestamp which is greater than start. */
+test('NbsDecoder.nextTimestamp() returns a timestamp greater than input', () => {
   const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
-  const new_timestamp = decoder.stepFrame(start, { type: pingType, subtype: 0} , 1, true);
+  const singleTypeTimestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0} , 1);
+  const multiTypeTimestamp = decoder.nextTimestamp(start, testArray , 1);
 
   assert.ok(
-   tsToBigInt(new_timestamp) > tsToBigInt(start),
+   tsToBigInt(singleTypeTimestamp) > tsToBigInt(start),
    'The new return Nbs timestamp is greater than the input timestamp'
  );
+
+ assert.ok(
+  tsToBigInt(multiTypeTimestamp) > tsToBigInt(start),
+  'The new return Nbs timestamp is greater than the input timestamp'
+);
+ })
+// });
+
+/* Check stepping forward by five returns the expected timestamp.  */
+test(`NbsDecoder.nextTimestamp() returns exact value expected`, () => {
+  const [start, end] = decoder.getTimestampRange( { type: pingType, subtype: 0 });
+  const singleTypeTimestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 5);
+  const multiTypeTimestamp = decoder.nextTimestamp(start, testArray , 5);
+
+  assert.equal(tsToBigInt(singleTypeTimestamp),
+  tsToBigInt({seconds: 1015, nanos: 0}))
+
+  assert.equal(tsToBigInt(multiTypeTimestamp),
+  tsToBigInt({seconds: 1012, nanos: 0}))
 });
 
-/* Test Three: Check +2 steps returns the correct timestamp: 1634090013210511360. */
-test("NbsDecoder.stepFrame() Check step = 2 -> steps correctly 2 frames forward", () => {
+/* Check stepping backward returns a timestamp which is less than input. */
+test('NbsDecoder.nextTimestamp() returns a timestamp less than input', () => {
   const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
-  const new_timestamp = decoder.stepFrame(start, { type: pingType, subtype: 0 }, 2, true);
-  
-  const twoFramesAhead = { seconds: 1006, nanos: 0 }
-    assert.equal(
-      tsToBigInt(new_timestamp), tsToBigInt(twoFramesAhead)
-    )
-});
+  const singleTypeTimestamp = decoder.nextTimestamp(end, { type: pingType, subtype: 0 }, -1)
 
-/* Test Four: Check varying input types for timestamp work correctly. */
-test('NbsDecoder.stepFrame()) accepts `number`, `BigInt` or `{ seconds, nanos }` for timestamp argument', () => {
-  const packetsFromNumber = decoder.stepFrame((1500 * 1e9), { type: pingType, subtype: 0 }, 1, true);
-  const packetsFromBigInt = decoder.stepFrame((1500 * 1e9), { type: pingType, subtype: 0 }, 1, true);
-  const packetsFromTimestampObject = decoder.stepFrame((1500 * 1e9), { type: pingType, subtype: 0 }, 1, true);
-
-  assert.equal(packetsFromNumber, packetsFromBigInt);
-  assert.equal(packetsFromNumber, packetsFromTimestampObject);
-});
-
-/* Test Five: Check stepping backwards by 1 from the end timestamp is correct. */
-test('NbsDecoder.stepFrame()) Steps backwards by 1 frame', () => {
-  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 }); 
-  const new_timestamp = decoder.stepFrame(end, { type: pingType, subtype: 0 }, 1, false);
+   const multiTypeTimestamp = decoder.nextTimestamp(end, testArray, -1)
 
   assert.ok(
-    tsToBigInt(new_timestamp) < tsToBigInt(end), 'New timestamp is less than input timestamp'
-  )
+   tsToBigInt(singleTypeTimestamp) < tsToBigInt(end),
+   'The return Nbs timestamp is less than the input timestamp for a single type'
+ );
 
-  assert.equal(
-    tsToBigInt(new_timestamp), tsToBigInt({ seconds: 1894, nanos: 0 }),
-    'New timestamp is equal to pre-determined second last timestamp in index'
-  )
+ assert.equal(
+  tsToBigInt(singleTypeTimestamp), tsToBigInt({seconds: 1894, nanos: 0}));
+  'The return Nbs timestamp exactly matches the expected timestamp'
+
+
+  assert.ok(
+    tsToBigInt(multiTypeTimestamp) < tsToBigInt(end),
+    'The return Nbs timestamp is less than the input timestamp for multiple types'
+  );
 });
 
-/* Test Six: Check stepping backwards by 1 from the end timestamp is correct. */
-test('NbsDecoder.stepFrame() Step backwards by 2 frames', () => {
-  const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 }); 
-  const new_timestamp = decoder.stepFrame((end ), { type: pingType, subtype: 0 }, 2, false);
-  
-  assert.equal(
-    tsToBigInt(new_timestamp), tsToBigInt({ seconds: 1891, nanos: 0 }),
-    'New timestamp is equal to pre-determined second last timestamp in index'
-  )
-})
-
-/* Test Seven: Error checking. */
-test('NbsDecoder.stepFrame() Throws error on missing or incorrect inputs.', () => {
+/* Error checking. */
+test('NbsDecoder.nextTimestamp() Throws error on missing or incorrect inputs.', () => {
   assert.throws(
     () => {
-      decoder.stepFrame();
+      decoder.nextTimestamp();
     },
     /invalid type for argument `timestamp`: expected positive number or BigInt/,
-    'NbsDecoder.stepFrame() throws for missing `timestamp` argument'
+    'NbsDecoder.nextTimestamp() throws for missing `timestamp` argument'
   );
 
   assert.throws(
     () => {
-      decoder.stepFrame("(1500 * 1e9)");
+      decoder.nextTimestamp("(1500 * 1e9)");
     },
     /invalid type for argument `timestamp`: expected positive number or BigInt/,
-    'NbsDecoder.stepFrame() throws for missing `timestamp` argument'
+    'NbsDecoder.nextTimestamp() throws for invalid `timestamp` argument'
   );
-  
+
   assert.throws(
     () => {
-      decoder.stepFrame(0, { type: pingType, subtype: "0" });
+      decoder.nextTimestamp(0, { type: pingType, subtype: "0" }, 1);
     },
     /invalid type for argument `typeSubtype`: invalid `.subtype`: expected number/,
-    'NbsDecoder.stepFrame() throws for object with invalid `subtype`'
+    'NbsDecoder.nextTimestamp() throws for object with invalid `subtype`'
   );
+
+  assert.throws(
+    () => {
+      decoder.nextTimestamp((1500 * 1e9), "a");
+    },
+    /invalid step input. A number was expected./,
+    'NbsDecoder.nextTimestamp() throws for missing `timestamp` argument'
+  );
+
 })
 
 test.run();
