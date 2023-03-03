@@ -5,6 +5,7 @@
             "sources": [
                 "src/binding.cpp",
                 "src/Decoder.cpp",
+                "src/Encoder.cpp",
                 "src/xxhash/xxhash.c",
             ],
             "cflags": [],

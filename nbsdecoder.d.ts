@@ -97,3 +97,21 @@ export declare class NbsDecoder {
     types: NbsTypeSubtype[]
   ): NbsPacket[];
 }
+
+export declare class NbsEncoder {
+  public constructor(path: string);
+
+  /**
+   * Write a packet to the nbs file.
+   *
+   * @param timestamp The emit timestamp of the packet
+   * @param packet Packet to write to the file
+   */
+  public write(timestamp: number | BigInt | NbsTimestamp, packet: NbsPacket): number;
+
+  public getBytesWritten(): BigInt;
+
+  public close(): void;
+
+  public isOpen(): boolean;
+}
