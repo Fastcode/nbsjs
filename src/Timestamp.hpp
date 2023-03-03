@@ -1,7 +1,6 @@
 #ifndef TIMESTAMP_HPP
 #define TIMESTAMP_HPP
 
-#include <iostream>
 #include <napi.h>
 
 namespace nbs {
@@ -39,8 +38,6 @@ namespace nbs {
             else {
                 throw std::runtime_error("expected positive number or BigInt or timestamp object");
             }
-
-            std::cout << "Timestamp: " << timestamp << std::endl;
             return timestamp;
         }
 
