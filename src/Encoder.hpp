@@ -32,6 +32,10 @@ namespace nbs {
         std::unique_ptr<zstr::ofstream> index_file;
         /// The total number of bytes written to the nbs file so far
         uint64_t bytes_written{0};
+
+        uint64_t WritePacket(const Packet& packet, const uint64_t& emit_timestamp);
+
+        void WriteIndex(const Packet& packet, const uint64_t& offset, const uint32_t size);
     };
 }  // namespace nbs
 
