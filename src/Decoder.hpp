@@ -51,13 +51,6 @@ namespace nbs {
         /// Convert the given XX64 hash to a JS Buffer value
         Napi::Value HashToJsValue(const uint64_t& hash, const Napi::Env& env);
 
-        /// Convert the given JS value to a timestamp in nanoseconds.
-        /// The JS value can be a number, BigInt, or an object with `seconds` and `nanos` properties.
-        uint64_t TimestampFromJsValue(const Napi::Value& jsTimestamp, const Napi::Env& env);
-
-        /// Convert the given timestamp to a JS object with `seconds` and `nanos` properties
-        Napi::Value TimestampToJsValue(const uint64_t& timestamp, const Napi::Env& env);
-
         /// Convert the given JS object with `type` and `subtype` properties to a TypeSubtype struct
         TypeSubtype TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env);
     };
