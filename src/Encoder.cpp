@@ -66,8 +66,8 @@ namespace nbs {
 
         auto path = info[0].As<Napi::String>().Utf8Value();
 
-        this->output_file.open(path);
-        this->index_file.open(path + ".idx");
+        output_file.open(path);
+        index_file = std::make_unique<zstr::ofstream>(path + ".idx");
     }
 
     Napi::Value Encoder::Write(const Napi::CallbackInfo& info) {
@@ -129,7 +129,7 @@ namespace nbs {
         std::vector<uint8_t> packetBytes(sizeof(PacketHeader), '\0');
 
         // Placement new the header to put the data in
-        new (packetBytes.data()) PacketHeader(size, packet.timestamp, packet.type);
+        new (packetBytes.data()) PacketHeader(size, emit_timestamp, packet.type);
 
         // Load the data into the packet
         const auto* data_c = reinterpret_cast<const uint8_t*>(packet.payload);
@@ -138,9 +138,28 @@ namespace nbs {
         // Write out the packet
         output_file.write(reinterpret_cast<const char*>(packetBytes.data()), int64_t(packetBytes.size()));
 
-        uint32_t full_size = packetBytes.size();
+        // NBS Index File Format
+        // Name      | Type               |  Description
+        // ------------------------------------------------------------
+        // hash      | uint64_t           | the 64bit hash for the payload type
+        // subtype   | uint32_t           | the id field of the payload
+        // timestamp | uint64_t           | Timestamp of the message or the emit timestamp in nanoseconds
+        // offset    | uint64_t           | offset to start of radiation symbol ☢
+        // size      | uint32_t           | Size of the whole packet from the radiation symbol
+
+        // Calculate the NBS Packets full size
+        uint32_t full_size(packetBytes.size());
+
+        auto index_writer = index_file.get();
+        index_writer->write(reinterpret_cast<const char*>(&packet.type), sizeof(packet.type));
+        index_writer->write(reinterpret_cast<const char*>(&packet.subtype), sizeof(packet.subtype));
+        index_writer->write(reinterpret_cast<const char*>(&packet.timestamp), sizeof(packet.timestamp));
+        index_writer->write(reinterpret_cast<const char*>(&bytes_written), sizeof(bytes_written));
+        index_writer->write(reinterpret_cast<const char*>(&full_size), sizeof(full_size));
+        index_writer->flush();
 
         bytes_written += packet.length;
+
         return this->GetBytesWritten(info);
     }
 
@@ -151,7 +170,7 @@ namespace nbs {
     void Encoder::Close(const Napi::CallbackInfo& info) {
         if (this->IsOpen(info).As<Napi::Boolean>()) {
             this->output_file.close();
-            this->index_file.close();
+            this->index_file.get()->close();
         }
     }
 

@@ -29,7 +29,7 @@ namespace nbs {
         /// The nbs file being written to
         std::ofstream output_file;
         /// The index file of the nbs file being written to
-        zstr::ofstream index_file;
+        std::unique_ptr<zstr::ofstream> index_file;
         /// The total number of bytes written to the nbs file so far
         uint64_t bytes_written{0};
     };
