@@ -1,6 +1,5 @@
 #include "Encoder.hpp"
 
-#include <iostream>
 #include <napi.h>
 
 #include "Packet.hpp"
@@ -66,7 +65,6 @@ namespace nbs {
         }
 
         auto path = info[0].As<Napi::String>().Utf8Value();
-        std::cout << path << std::endl;
 
         this->output_file.open(path);
         this->index_file.open(path + ".idx");
