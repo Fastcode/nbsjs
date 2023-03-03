@@ -44,13 +44,6 @@ namespace nbs {
         /// Read the packet for the given index item
         Packet Read(const IndexItemFile& item);
 
-        /// Create a XX64 hash from the given JS value, which could be a string or a buffer.
-        /// String values will be hashed, and buffers will be interpreted as a XX64 hash.
-        uint64_t HashFromJsValue(const Napi::Value& jsHash, const Napi::Env& env);
-
-        /// Convert the given XX64 hash to a JS Buffer value
-        Napi::Value HashToJsValue(const uint64_t& hash, const Napi::Env& env);
-
         /// Convert the given JS object with `type` and `subtype` properties to a TypeSubtype struct
         TypeSubtype TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env);
     };

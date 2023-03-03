@@ -3,11 +3,11 @@
 #include <napi.h>
 #include <string>
 
+#include "Hash.hpp"
 #include "IndexItem.hpp"
 #include "Packet.hpp"
 #include "Timestamp.hpp"
 #include "TypeSubtype.hpp"
-#include "xxhash/xxhash.h"
 
 namespace nbs {
 
@@ -113,7 +113,7 @@ namespace nbs {
         for (size_t i = 0; i < availableTypes.size(); i++) {
             auto jsType = Napi::Object::New(env);
 
-            jsType.Set("type", this->HashToJsValue(availableTypes[i].type, env));
+            jsType.Set("type", Hash::ToJsValue(availableTypes[i].type, env));
             jsType.Set("subtype", Napi::Number::New(env, availableTypes[i].subtype));
 
             jsTypes[i] = jsType;
@@ -202,7 +202,7 @@ namespace nbs {
             auto jsPacket = Napi::Object::New(env);
 
             jsPacket.Set("timestamp", Timestamp::ToJsValue(packets[i].timestamp, env));
-            jsPacket.Set("type", HashToJsValue(packets[i].type, env));
+            jsPacket.Set("type", Hash::ToJsValue(packets[i].type, env));
             jsPacket.Set("subtype", Napi::Number::New(env, packets[i].subtype));
 
             if (packets[i].payload == nullptr) {
@@ -275,42 +275,6 @@ namespace nbs {
         return packet;
     }
 
-    uint64_t Decoder::HashFromJsValue(const Napi::Value& jsHash, const Napi::Env& env) {
-        uint64_t hash = 0;
-
-        // If we have a string, apply XXHash to get the hash
-        if (jsHash.IsString()) {
-            std::string s = jsHash.As<Napi::String>().Utf8Value();
-            hash          = XXH64(s.c_str(), s.size(), 0x4e55436c);
-        }
-        // Otherwise try to interpret it as a buffer that contains the hash
-        else if (jsHash.IsTypedArray()) {
-            Napi::TypedArray typedArray = jsHash.As<Napi::TypedArray>();
-            Napi::ArrayBuffer buffer    = typedArray.ArrayBuffer();
-
-            uint8_t* data  = reinterpret_cast<uint8_t*>(buffer.Data());
-            uint8_t* start = data + typedArray.ByteOffset();
-            uint8_t* end   = start + typedArray.ByteLength();
-
-            if (std::distance(start, end) == 8) {
-                std::memcpy(&hash, start, 8);
-            }
-            else {
-                throw std::runtime_error("provided Buffer length is not 8");
-            }
-        }
-        else {
-            throw std::runtime_error("expected a string or Buffer");
-        }
-
-        return hash;
-    }
-
-    Napi::Value Decoder::HashToJsValue(const uint64_t& hash, const Napi::Env& env) {
-        return Napi::Buffer<uint8_t>::Copy(env, reinterpret_cast<const uint8_t*>(&hash), sizeof(uint64_t))
-            .As<Napi::Value>();
-    }
-
     TypeSubtype Decoder::TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env) {
         if (!jsTypeSubtype.IsObject()) {
             throw std::runtime_error("expected object");
@@ -325,7 +289,7 @@ namespace nbs {
         uint64_t type = 0;
 
         try {
-            type = this->HashFromJsValue(typeSubtype.Get("type"), env);
+            type = Hash::FromJsValue(typeSubtype.Get("type"), env);
         }
         catch (const std::exception& ex) {
             throw std::runtime_error("invalid `.type`: " + std::string(ex.what()));
