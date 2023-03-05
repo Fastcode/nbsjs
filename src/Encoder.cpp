@@ -162,8 +162,8 @@ namespace nbs {
         new (packetBytes.data()) PacketHeader(size, emitTimestamp, packet.type);
 
         // Load the data into the packet
-        const auto* data_c = reinterpret_cast<const uint8_t*>(packet.payload);
-        packetBytes.insert(packetBytes.end(), data_c, data_c + packet.length);
+        const auto* data = reinterpret_cast<const uint8_t*>(packet.payload);
+        packetBytes.insert(packetBytes.end(), data, data + packet.length);
 
         // Write out the packet
         outputFile.get()->write(reinterpret_cast<const char*>(packetBytes.data()), int64_t(packetBytes.size()));
