@@ -73,25 +73,16 @@ namespace nbs {
     Napi::Value Encoder::Write(const Napi::CallbackInfo& info) {
         Napi::Env env = info.Env();
 
+        // Expected parameters:
+        // ( packet: NbsPacket, timestamp?: number | BigInt | NbsTimestamp )
+
         if (info.Length() == 0) {
-            Napi::TypeError::New(env, "missing argument `data`: provide data to write to the file")
+            Napi::TypeError::New(env, "missing argument `packet`: provide a packet to write to the file")
                 .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
-        uint64_t emitTimestamp = 0;
         Packet packet;
-
-        try {
-            // Get timestamp in micros
-            emitTimestamp = Timestamp::FromJsValue(info[0], env) / 1000;
-        }
-        catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
-                .ThrowAsJavaScriptException();
-            return env.Undefined();
-        }
-
         try {
             packet = Packet::FromJsValue(info[1], env);
         }
@@ -101,11 +92,24 @@ namespace nbs {
             return env.Undefined();
         }
 
+        uint64_t emitTimestamp = packet.timestamp;
+        if (info.Length() > 1 && !info[1].IsUndefined()) {
+            try {
+                // Get timestamp in micros
+                emitTimestamp = Timestamp::FromJsValue(info[0], env) / 1000;
+            }
+            catch (const std::exception& ex) {
+                Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
+                    .ThrowAsJavaScriptException();
+                return env.Undefined();
+            }
+        }
+
         // Calculate the NBS Packets full size
         uint32_t size = WritePacket(packet, emitTimestamp);
         bytesWritten += packet.length;
 
-        WriteIndex(packet, size);
+        WriteIndex(packet, emitTimestamp, size);
 
         return this->GetBytesWritten(info);
     }
@@ -125,7 +129,7 @@ namespace nbs {
         return Napi::Boolean::New(info.Env(), this->outputFile.get()->is_open());
     }
 
-    uint64_t Encoder::WritePacket(const Packet& packet, const uint64_t& emit_timestamp) {
+    uint64_t Encoder::WritePacket(const Packet& packet, const uint64_t& emitTimestamp) {
 
         // NBS File Format
         // Name      | Type               |  Description
@@ -155,7 +159,7 @@ namespace nbs {
         std::vector<uint8_t> packetBytes(sizeof(PacketHeader), '\0');
 
         // Placement new the header to put the data in
-        new (packetBytes.data()) PacketHeader(size, emit_timestamp, packet.type);
+        new (packetBytes.data()) PacketHeader(size, emitTimestamp, packet.type);
 
         // Load the data into the packet
         const auto* data_c = reinterpret_cast<const uint8_t*>(packet.payload);
@@ -167,7 +171,7 @@ namespace nbs {
         return packetBytes.size();
     }
 
-    void Encoder::WriteIndex(const Packet& packet, const uint32_t& size) {
+    void Encoder::WriteIndex(const Packet& packet, const uint64_t& emitTimestamp, const uint32_t& size) {
 
         // NBS Index File Format
         // Name      | Type               |  Description
@@ -196,7 +200,7 @@ namespace nbs {
 #pragma pack(pop)
 
         std::vector<uint8_t> headerBytes(sizeof(PacketIndex), '\0');
-        new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, packet.timestamp, bytesWritten, size);
+        new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, emitTimestamp, bytesWritten, size);
 
         // Write out the header
         indexFile.get()->write(reinterpret_cast<const char*>(headerBytes.data()), int64_t(headerBytes.size()));

@@ -99,19 +99,34 @@ export declare class NbsDecoder {
 }
 
 export declare class NbsEncoder {
+  /**
+   * Create a new NbsEncoder instance
+   *
+   * @param path Absolute path of the nbs file to write to.
+   */
   public constructor(path: string);
 
   /**
    * Write a packet to the nbs file.
    *
-   * @param timestamp The emit timestamp of the packet
    * @param packet Packet to write to the file
+   * @param timestamp The emit timestamp of the packet. If undefined, the packet timestamp
+   *                  will be used instead.
    */
-  public write(timestamp: number | BigInt | NbsTimestamp, packet: NbsPacket): number;
+  public write(packet: NbsPacket, timestamp?: number | BigInt | NbsTimestamp): number;
 
+  /**
+   * Get the total number of bytes written to the nbs file.
+   */
   public getBytesWritten(): BigInt;
 
+  /**
+   * Close the writer's to both the nbs file and its index file.
+   */
   public close(): void;
 
+  /**
+   * Returns true if the file writer to the nbs file is open.
+   */
   public isOpen(): boolean;
 }

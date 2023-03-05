@@ -35,7 +35,7 @@ namespace nbs {
 
         uint64_t WritePacket(const Packet& packet, const uint64_t& emitTimestamp);
 
-        void WriteIndex(const Packet& packet, const uint32_t& size);
+        void WriteIndex(const Packet& packet, const uint64_t& emitTimestamp, const uint32_t& size);
     };
 }  // namespace nbs
 
