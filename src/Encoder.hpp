@@ -27,7 +27,7 @@ namespace nbs {
         /// The size of the radiation symbol at the start of each packet
         static constexpr int HEADER_SIZE = 3;
         /// The nbs file being written to
-        std::ofstream outputFile;
+        std::unique_ptr<std::ofstream> outputFile;
         /// The index file of the nbs file being written to
         std::unique_ptr<zstr::ofstream> indexFile;
         /// The total number of bytes written to the nbs file so far
