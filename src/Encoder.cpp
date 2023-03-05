@@ -84,7 +84,7 @@ namespace nbs {
 
         Packet packet;
         try {
-            packet = Packet::FromJsValue(info[1], env);
+            packet = Packet::FromJsValue(info[0], env);
         }
         catch (const std::exception& ex) {
             Napi::TypeError::New(env, std::string("invalid type for argument `packet`: ") + ex.what())
@@ -96,7 +96,7 @@ namespace nbs {
         if (info.Length() > 1 && !info[1].IsUndefined()) {
             try {
                 // Get timestamp in micros
-                emitTimestamp = Timestamp::FromJsValue(info[0], env) / 1000;
+                emitTimestamp = Timestamp::FromJsValue(info[1], env) / 1000;
             }
             catch (const std::exception& ex) {
                 Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
