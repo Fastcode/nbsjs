@@ -20,7 +20,7 @@ namespace nbs {
         /// A pointer to the beginning of the packet payload
         uint8_t* payload;
 
-        /// The packet length in bytes, including the header
+        /// The length of the payload in bytes (excluding the header)
         uint32_t length;
 
         /// Convert the given JS value to a timestamp in nanoseconds.
