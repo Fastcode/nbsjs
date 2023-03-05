@@ -27,15 +27,15 @@ namespace nbs {
         /// The size of the radiation symbol at the start of each packet
         static constexpr int HEADER_SIZE = 3;
         /// The nbs file being written to
-        std::ofstream output_file;
+        std::ofstream outputFile;
         /// The index file of the nbs file being written to
-        std::unique_ptr<zstr::ofstream> index_file;
+        std::unique_ptr<zstr::ofstream> indexFile;
         /// The total number of bytes written to the nbs file so far
-        uint64_t bytes_written{0};
+        uint64_t bytesWritten{0};
 
-        uint64_t WritePacket(const Packet& packet, const uint64_t& emit_timestamp);
+        uint64_t WritePacket(const Packet& packet, const uint64_t& emitTimestamp);
 
-        void WriteIndex(const Packet& packet, const uint64_t& offset, const uint32_t size);
+        void WriteIndex(const Packet& packet, const uint32_t& size);
     };
 }  // namespace nbs
 
