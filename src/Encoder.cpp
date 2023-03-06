@@ -107,9 +107,9 @@ namespace nbs {
 
         // Calculate the NBS Packets full size
         uint32_t size = WritePacket(packet, emitTimestamp);
-        bytesWritten += packet.length;
-
         WriteIndex(packet, emitTimestamp, size);
+
+        bytesWritten += packet.length;
 
         return this->GetBytesWritten(info);
     }
@@ -201,6 +201,9 @@ namespace nbs {
 
         std::vector<uint8_t> headerBytes(sizeof(PacketIndex), '\0');
         new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, emitTimestamp, bytesWritten, size);
+
+        std::cout << "Offset: " << bytesWritten << std::endl;
+        std::cout << "Size: " << size << std::endl;
 
         // Write out the header
         indexFile.get()->write(reinterpret_cast<const char*>(headerBytes.data()), int64_t(headerBytes.size()));
