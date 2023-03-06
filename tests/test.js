@@ -550,6 +550,7 @@ test('NbsEncoder write throws for invalid arguments', () => {
     'NbsEncoder write() throws with incorrect types for timestamp properties'
   );
 
+  // Delete file written to
   fs.unlinkSync(writePath);
   fs.unlinkSync(writePath + ".idx");
 });
@@ -583,6 +584,7 @@ test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
   assert.equal(packets[0], pingPacket);
   assert.equal(packets[1], pongPacket);
 
+  // Delete file written to
   fs.unlinkSync(writePath);
   fs.unlinkSync(writePath + ".idx");
 });
