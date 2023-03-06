@@ -3,7 +3,6 @@
 #include <napi.h>
 
 #include "Packet.hpp"
-#include "Timestamp.hpp"
 
 namespace nbs {
 
