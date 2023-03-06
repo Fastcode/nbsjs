@@ -95,8 +95,7 @@ namespace nbs {
         uint64_t emitTimestamp = packet.timestamp;
         if (info.Length() > 1 && !info[1].IsUndefined()) {
             try {
-                // Get timestamp in micros
-                emitTimestamp = Timestamp::FromJsValue(info[1], env) / 1000;
+                emitTimestamp = Timestamp::FromJsValue(info[1], env);
             }
             catch (const std::exception& ex) {
                 Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
@@ -129,7 +128,7 @@ namespace nbs {
         return Napi::Boolean::New(info.Env(), this->outputFile.get()->is_open());
     }
 
-    uint64_t Encoder::WritePacket(const Packet& packet, const uint64_t& emitTimestamp) {
+    uint64_t Encoder::WritePacket(const Packet& packet, const uint64_t& emitTimestampNanos) {
 
         // NBS File Format
         // Name      | Type               |  Description
@@ -159,7 +158,7 @@ namespace nbs {
         std::vector<uint8_t> packetBytes(sizeof(PacketHeader), '\0');
 
         // Placement new the header to put the data in
-        new (packetBytes.data()) PacketHeader(size, emitTimestamp, packet.type);
+        new (packetBytes.data()) PacketHeader(size, emitTimestampNanos / 1000, packet.type);
 
         // Load the data into the packet
         const auto* data = reinterpret_cast<const uint8_t*>(packet.payload);
