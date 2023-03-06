@@ -119,7 +119,7 @@ export declare class NbsEncoder {
   public getBytesWritten(): BigInt;
 
   /**
-   * Close the writer's to both the nbs file and its index file.
+   * Close the writers for both the nbs file and its index file.
    */
   public close(): void;
 
