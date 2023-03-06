@@ -109,7 +109,7 @@ namespace nbs {
         uint32_t size = WritePacket(packet, emitTimestamp);
         WriteIndex(packet, emitTimestamp, size);
 
-        bytesWritten += packet.length;
+        bytesWritten += size;
 
         return this->GetBytesWritten(info);
     }
