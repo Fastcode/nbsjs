@@ -48,8 +48,21 @@ namespace nbs {
             }
 
             // Check types are valid
-            uint64_t timestamp = Timestamp::FromJsValue(jsObject.Get("timestamp"), env);
-            uint64_t type      = Hash::FromJsValue(jsObject.Get("type"), env);
+            uint64_t timestamp = 0;
+            try {
+                timestamp = Timestamp::FromJsValue(jsObject.Get("timestamp"), env);
+            }
+            catch (const std::exception& ex) {
+                throw std::runtime_error(std::string("error in `timestamp`: ") + ex.what());
+            }
+
+            uint64_t type = 0;
+            try {
+                type = Hash::FromJsValue(jsObject.Get("type"), env);
+            }
+            catch (const std::exception& ex) {
+                throw std::runtime_error(std::string("error in `type`: ") + ex.what());
+            }
 
             if (!jsObject.Get("subtype").IsNumber()) {
                 throw std::runtime_error("expected `subtype` to be number");
