@@ -14,6 +14,8 @@ npm install nbsdecoder.js --save
 
 ## Usage
 
+This package contains classes for reading and writing nbs files.
+
 The following example shows a typical usage pattern of creating a decoder with nbs file paths, and reading types, timestamps, and data packets.
 
 ```js
@@ -38,6 +40,36 @@ const packets = decoder.getPackets(start, [firstType]);
 
 // Log all the values for inspection
 console.log({ types, firstType, start, end, packets });
+```
+
+The following example shows a typical usage pattern of creating an encoder with an nbs file path and writing a packet to it.
+
+```js
+const { NbsEncoder } = require('nbsdecoder.js');
+
+// Create an encoder instance
+const encoder = new NbsEncoder('/path/to/new/file.nbs');
+
+// Create a packet to write to the file
+const packet = {
+  // Timestamp that the packet was emitted
+  timestamp: { seconds: 2000, nanos: 0 },
+
+  // The nuclear hash of the message type name (In this example 'message.Ping')
+  type: Buffer.from('8ce1582fa0eadc84', 'hex'),
+
+  // Subtype of the packet
+  subtype: 0,
+
+  // Bytes of the payload
+  payload: Buffer.from('Message', 'utf8'),
+};
+
+// Write the packet to the file
+encoder.write(packet);
+
+// Close the file reader
+encoder.close();
 ```
 
 ## API
