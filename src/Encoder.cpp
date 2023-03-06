@@ -72,9 +72,6 @@ namespace nbs {
     Napi::Value Encoder::Write(const Napi::CallbackInfo& info) {
         Napi::Env env = info.Env();
 
-        // Expected parameters:
-        // ( packet: NbsPacket, timestamp?: number | BigInt | NbsTimestamp )
-
         if (info.Length() == 0) {
             Napi::TypeError::New(env, "missing argument `packet`: provide a packet to write to the file")
                 .ThrowAsJavaScriptException();
