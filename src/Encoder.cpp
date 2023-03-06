@@ -92,21 +92,9 @@ namespace nbs {
             return env.Undefined();
         }
 
-        uint64_t emitTimestamp = packet.timestamp;
-        if (info.Length() > 1 && !info[1].IsUndefined()) {
-            try {
-                emitTimestamp = Timestamp::FromJsValue(info[1], env);
-            }
-            catch (const std::exception& ex) {
-                Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
-                    .ThrowAsJavaScriptException();
-                return env.Undefined();
-            }
-        }
-
         // Calculate the NBS Packets full size
-        uint32_t size = WritePacket(packet, emitTimestamp);
-        WriteIndex(packet, emitTimestamp, size);
+        uint32_t size = WritePacket(packet);
+        WriteIndex(packet, size);
 
         bytesWritten += size;
 
@@ -128,7 +116,7 @@ namespace nbs {
         return Napi::Boolean::New(info.Env(), this->outputFile.get()->is_open());
     }
 
-    uint64_t Encoder::WritePacket(const Packet& packet, const uint64_t& emitTimestampNanos) {
+    uint64_t Encoder::WritePacket(const Packet& packet) {
 
         // NBS File Format
         // Name      | Type               |  Description
@@ -141,6 +129,8 @@ namespace nbs {
 
         // The size of our output timestamp, hash and data
         uint32_t size = sizeof(packet.timestamp) + sizeof(packet.type) + packet.length;
+
+        uint64_t timestampMicros = packet.timestamp / 1000;
 
 #pragma pack(push, 1)
         struct PacketHeader {
@@ -158,7 +148,7 @@ namespace nbs {
         std::vector<uint8_t> packetBytes(sizeof(PacketHeader), '\0');
 
         // Placement new the header to put the data in
-        new (packetBytes.data()) PacketHeader(size, emitTimestampNanos / 1000, packet.type);
+        new (packetBytes.data()) PacketHeader(size, timestampMicros, packet.type);
 
         // Load the data into the packet
         const auto* data = reinterpret_cast<const uint8_t*>(packet.payload);
@@ -170,7 +160,7 @@ namespace nbs {
         return packetBytes.size();
     }
 
-    void Encoder::WriteIndex(const Packet& packet, const uint64_t& emitTimestamp, const uint32_t& size) {
+    void Encoder::WriteIndex(const Packet& packet, const uint32_t& size) {
 
         // NBS Index File Format
         // Name      | Type               |  Description
@@ -199,7 +189,7 @@ namespace nbs {
 #pragma pack(pop)
 
         std::vector<uint8_t> headerBytes(sizeof(PacketIndex), '\0');
-        new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, emitTimestamp, bytesWritten, size);
+        new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, packet.timestamp, bytesWritten, size);
 
         std::cout << "Offset: " << bytesWritten << std::endl;
         std::cout << "Size: " << size << std::endl;

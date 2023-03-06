@@ -110,10 +110,8 @@ export declare class NbsEncoder {
    * Write a packet to the nbs file.
    *
    * @param packet Packet to write to the file
-   * @param timestamp The emit timestamp of the packet. If undefined, the packet timestamp
-   *                  will be used instead.
    */
-  public write(packet: NbsPacket, timestamp?: number | BigInt | NbsTimestamp): number;
+  public write(packet: NbsPacket): number;
 
   /**
    * Get the total number of bytes written to the nbs file.
