@@ -8,7 +8,7 @@ namespace nbs {
 
         /// Convert the given JS value to a timestamp in nanoseconds.
         /// The JS value can be a number, BigInt, or an object with `seconds` and `nanos` properties.
-        static uint64_t FromJsValue(const Napi::Value& jsTimestamp, const Napi::Env& env) {
+        static inline uint64_t FromJsValue(const Napi::Value& jsTimestamp, const Napi::Env& env) {
 
             uint64_t timestamp = 0;
 
@@ -42,7 +42,7 @@ namespace nbs {
         }
 
         /// Convert the given timestamp to a JS object with `seconds` and `nanos` properties
-        static Napi::Value ToJsValue(const uint64_t timestamp, const Napi::Env& env) {
+        static inline Napi::Value ToJsValue(const uint64_t timestamp, const Napi::Env& env) {
             Napi::Object jsTimestamp = Napi::Object::New(env);
             jsTimestamp.Set("seconds", Napi::Number::New(env, timestamp / 1000000000L));
             jsTimestamp.Set("nanos", Napi::Number::New(env, timestamp % 1000000000L));

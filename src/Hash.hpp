@@ -11,7 +11,7 @@ namespace nbs {
 
         /// Create a XX64 hash from the given JS value, which could be a string or a buffer.
         /// String values will be hashed, and buffers will be interpreted as a XX64 hash.
-        static uint64_t FromJsValue(const Napi::Value& jsHash, const Napi::Env& env) {
+        static inline uint64_t FromJsValue(const Napi::Value& jsHash, const Napi::Env& env) {
             uint64_t hash = 0;
 
             // If we have a string, apply XXHash to get the hash
@@ -43,7 +43,7 @@ namespace nbs {
         }
 
         /// Convert the given XX64 hash to a JS Buffer value
-        static Napi::Value ToJsValue(const uint64_t& hash, const Napi::Env& env) {
+        static inline Napi::Value ToJsValue(const uint64_t& hash, const Napi::Env& env) {
             return Napi::Buffer<uint8_t>::Copy(env, reinterpret_cast<const uint8_t*>(&hash), sizeof(uint64_t))
                 .As<Napi::Value>();
         }
