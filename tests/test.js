@@ -438,7 +438,6 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
   });
 });
 
-
 test('NbsEncoder constructor throws for invalid arguments', () => {
   assert.throws(
     () => {
@@ -458,23 +457,22 @@ test('NbsEncoder constructor throws for invalid arguments', () => {
 });
 
 test('NbsEncoder write throws for invalid arguments', () => {
-
-  const writePath = path.join(samplesDir, 'writeTest.nbs')
+  const writePath = path.join(samplesDir, 'writeTest.nbs');
   const encoder = new NbsEncoder(writePath);
 
   assert.throws(
     () => {
       encoder.write();
-    }, 
-    /missing argument `packet`: provide a packet to write to the file/, 
+    },
+    /missing argument `packet`: provide a packet to write to the file/,
     'NbsEncoder write() throws without packet argument'
   );
 
   assert.throws(
     () => {
       encoder.write({});
-    }, 
-    /invalid type for argument `packet`: expected object with `timestamp` key/, 
+    },
+    /invalid type for argument `packet`: expected object with `timestamp` key/,
     'NbsEncoder write() throws without timestamp in packet'
   );
 
@@ -483,8 +481,8 @@ test('NbsEncoder write throws for invalid arguments', () => {
       encoder.write({
         timestamp: { seconds: 1897, nanos: 0 },
       });
-    }, 
-    /invalid type for argument `packet`: expected object with `type` key/, 
+    },
+    /invalid type for argument `packet`: expected object with `type` key/,
     'NbsEncoder write() throws without type in packet'
   );
 
@@ -494,8 +492,8 @@ test('NbsEncoder write throws for invalid arguments', () => {
         timestamp: { seconds: 1897, nanos: 0 },
         type: pingType,
       });
-    }, 
-    /invalid type for argument `packet`: expected object with `subtype` key/, 
+    },
+    /invalid type for argument `packet`: expected object with `subtype` key/,
     'NbsEncoder write() throws without subtype in packet'
   );
 
@@ -506,21 +504,21 @@ test('NbsEncoder write throws for invalid arguments', () => {
         type: pingType,
         subtype: 0,
       });
-    }, 
-    /invalid type for argument `packet`: expected object with `payload` key/, 
+    },
+    /invalid type for argument `packet`: expected object with `payload` key/,
     'NbsEncoder write() throws without payload in packet'
   );
 
   assert.throws(
     () => {
       encoder.write({
-        timestamp: "string",
+        timestamp: 'string',
         type: pingType,
         subtype: 0,
         payload: Buffer.from('ping.699', 'utf8'),
       });
-    }, 
-    /invalid type for argument `packet`: error in `timestamp`: expected positive number or BigInt or timestamp object/, 
+    },
+    /invalid type for argument `packet`: error in `timestamp`: expected positive number or BigInt or timestamp object/,
     'NbsEncoder write() throws with incorrect type for timestamp'
   );
 
@@ -532,31 +530,30 @@ test('NbsEncoder write throws for invalid arguments', () => {
         subtype: 0,
         payload: Buffer.from('ping.699', 'utf8'),
       });
-    }, 
-    /invalid type for argument `packet`: error in `timestamp`: expected object with `seconds` and `nanos` keys/, 
+    },
+    /invalid type for argument `packet`: error in `timestamp`: expected object with `seconds` and `nanos` keys/,
     'NbsEncoder write() throws for incorrect keys in timestamp'
   );
 
   assert.throws(
     () => {
       encoder.write({
-        timestamp: { seconds: "string", nanos: "string"},
+        timestamp: { seconds: 'string', nanos: 'string' },
         type: pingType,
         subtype: 0,
         payload: Buffer.from('ping.699', 'utf8'),
       });
-    }, 
-    /invalid type for argument `packet`: error in `timestamp`: `seconds` and `nanos` must be numbers/, 
+    },
+    /invalid type for argument `packet`: error in `timestamp`: `seconds` and `nanos` must be numbers/,
     'NbsEncoder write() throws with incorrect types for timestamp properties'
   );
 
   // Delete file written to
   fs.unlinkSync(writePath);
-  fs.unlinkSync(writePath + ".idx");
+  fs.unlinkSync(writePath + '.idx');
 });
 
 test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
-
   const writePath = path.join(samplesDir, 'writeTest.nbs');
   const encoder = new NbsEncoder(writePath);
 
@@ -572,7 +569,7 @@ test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
     subtype: 0,
     payload: Buffer.from('pong.699', 'utf8'),
   };
-  
+
   encoder.write(pingPacket);
   encoder.write(pongPacket);
   encoder.close();
@@ -586,7 +583,7 @@ test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
 
   // Delete file written to
   fs.unlinkSync(writePath);
-  fs.unlinkSync(writePath + ".idx");
+  fs.unlinkSync(writePath + '.idx');
 });
 
 test.run();
