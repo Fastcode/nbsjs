@@ -187,9 +187,6 @@ namespace nbs {
         std::vector<uint8_t> headerBytes(sizeof(PacketIndex), '\0');
         new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, packet.timestamp, bytesWritten, size);
 
-        std::cout << "Offset: " << bytesWritten << std::endl;
-        std::cout << "Size: " << size << std::endl;
-
         // Write out the header
         indexFile.get()->write(reinterpret_cast<const char*>(headerBytes.data()), int64_t(headerBytes.size()));
     }
