@@ -171,7 +171,7 @@ namespace nbs {
             steps = info[2].As<Napi::Number>().Int64Value();
         }
         catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid step input. A number was expected.") + ex.what())
+            Napi::TypeError::New(env, std::string("invalid type for argument `step`: expected number") + ex.what())
                 .ThrowAsJavaScriptException();
             return env.Undefined();
         }

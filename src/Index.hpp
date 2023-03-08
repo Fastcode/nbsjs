@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "IndexItem.hpp"
-#include "TimestampState.hpp"
 #include "TypeSubtype.hpp"
 #include "zstr/zstr.hpp"
 namespace nbs {
@@ -111,127 +110,54 @@ namespace nbs {
         }
 
 
-        // Get the timestamp where as many subtypes move forward without moving forward twice (still allowed when passed
-        // a single type)
+        // Get timestamp where as many subtypes move forward without moving forward twice.
         std::uint64_t nextTimestamp(const uint64_t& timestamp,
                                     const std::vector<TypeSubtype>& types,
                                     const int& steps) {
 
-            auto matchingIndexItems = this->getIteratorsForTypes(types);
+            auto matchingIndexItems = this->getIteratorsForTypes(types);  // Iterator for each type(s).
 
-            std::vector<TimestampState> states;
+            uint64_t best_timestamp = std::numeric_limits<uint64_t>::max();
+            uint64_t best_delta     = std::numeric_limits<uint64_t>::max();
 
-            for (auto& iteratorPair : matchingIndexItems) {
-                auto& begin = iteratorPair.first;
-                auto& end   = iteratorPair.second;
+            for (auto& range : matchingIndexItems) {
+                auto& begin = range.first;
+                auto& end   = range.second;
 
                 IndexItemFile target;
                 target.item.timestamp = timestamp;
 
-
                 if (begin != end) {
-                    // Find the first item with a timestamp greater than the requested timestamp
+                    // Find the first item with a timestamp greater than the requested timestamp.
                     auto position =
                         std::upper_bound(begin, end, target, [](const IndexItemFile& a, const IndexItemFile& b) {
                             return a.item.timestamp < b.item.timestamp;
                         });
 
-                    // This is before the beginning, the first packet is actually begin
-                    if (position != begin || position != end) {
-                        position = std::prev(position, 1);
-                    }
-                    else {
-                        throw std::invalid_argument("No packet found for this type at the requested timestamp");
+                    // Prevent position traversing past begin or end iterators, return respective iterator timestamp.
+                    if (std::next(position, (steps - 1)) < begin) {
+                        return begin->item.timestamp;
                     }
 
-                    states.push_back(TimestampState{0, position, begin, end});
-                }
-            }
-
-            if (states.empty()) {
-                throw std::runtime_error("File with requested types exist but contain no messages. ");
-            }
-
-            // Traverse through input type(s)
-            while (true) {
-                if (steps > 0) {
-                    auto min_val = std::min_element(  //
-                        states.begin(),
-                        states.end(),
-                        [](TimestampState& a, TimestampState& b) {
-                            auto a_time = std::next(a.position) == a.end ? std::numeric_limits<uint64_t>::max()
-                                                                         : std::next(a.position)->item.timestamp;
-                            auto b_time = std::next(b.position) == b.end ? std::numeric_limits<uint64_t>::max()
-                                                                         : std::next(b.position)->item.timestamp;
-                            return a_time < b_time;
-                        });
-
-                    // Check if the next step would move us off the end of the nbs file.
-                    if (std::distance(min_val->position, min_val->end) == 0) {
-                        return min_val->position->item.timestamp;
+                    else if (std::next(position, (steps - 1)) >= end) {
+                        return std::prev(end)->item.timestamp;
                     }
 
-                    if (types.size() > 1) {
-                        // Check if this next step would exceed our number of steps.
-                        if (min_val->jumps + 1 == steps) {
-                            auto best =
-                                std::max_element(states.begin(),
-                                                 states.end(),
-                                                 [](const TimestampState& a, const TimestampState& b) {
-                                                     return a.position->item.timestamp < b.position->item.timestamp;
-                                                 });
-                            return best->position->item.timestamp;
+                    // Step position forward/backwards by x amount and save best_timestamp.
+                    else if ((steps > 0 && std::distance(position, end) > steps)
+                             || (steps < 0 && std::distance(begin, position) > abs(steps)) || (steps == 0)) {
+
+                        auto ts        = std::next(position, (steps - 1))->item.timestamp;
+                        uint64_t delta = steps > 0 ? ts - timestamp : timestamp - ts;
+                        if (delta < best_delta) {
+                            best_delta     = delta;
+                            best_timestamp = ts;
                         }
                     }
-
-                    else {
-                        if (min_val->jumps == steps) {
-                            auto best =
-                                std::max_element(states.begin(),
-                                                 states.end(),
-                                                 [](const TimestampState& a, const TimestampState& b) {
-                                                     return a.position->item.timestamp < b.position->item.timestamp;
-                                                 });
-                            return best->position->item.timestamp;
-                        }
-                    }
-                    min_val->jumps++;
-                    min_val->position++;
-                }
-                // Dealing with negative steps
-                else {
-                    auto min_val = std::min_element(  //
-                        states.begin(),
-                        states.end(),
-                        [](TimestampState& a, TimestampState& b) {
-                            auto a_time = std::prev(a.position) == a.begin ? std::numeric_limits<uint64_t>::max()
-                                                                           : std::prev(a.position)->item.timestamp;
-                            auto b_time = std::prev(b.position) == b.begin ? std::numeric_limits<uint64_t>::max()
-                                                                           : std::prev(b.position)->item.timestamp;
-                            return a_time < b_time;
-                        });
-
-                    // Check if the next step would move us off the beginning of the nbs file.
-                    if (std::distance(min_val->position, min_val->end) == 0
-                        || std::distance(min_val->position, min_val->begin) == 0) {
-                        return min_val->position->item.timestamp;
-                    }
-
-                    if (min_val->jumps == -(steps) || min_val->position == min_val->begin) {
-                        auto best = std::min_element(states.begin(),
-                                                     states.end(),
-                                                     [](const TimestampState& a, const TimestampState& b) {
-                                                         return a.position->item.timestamp < b.position->item.timestamp;
-                                                     });
-                        return best->position->item.timestamp;
-                    }
-
-                    min_val->jumps++;
-                    min_val->position--;
                 }
             }
 
-            throw std::runtime_error("Unreachable");
+            return best_timestamp;
         }
 
 
