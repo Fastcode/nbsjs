@@ -1,5 +1,7 @@
 #include "Decoder.hpp"
 
+#include <cmath>
+#include <iostream>
 #include <napi.h>
 #include <string>
 
@@ -7,7 +9,6 @@
 #include "Packet.hpp"
 #include "TypeSubtype.hpp"
 #include "xxhash/xxhash.h"
-
 namespace nbs {
 
     Napi::Object Decoder::Init(Napi::Env& env, Napi::Object& exports) {
@@ -166,16 +167,6 @@ namespace nbs {
             return env.Undefined();
         }
 
-        int steps;
-        try {
-            steps = info[2].As<Napi::Number>().Int64Value();
-        }
-        catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid type for argument `step`: expected number") + ex.what())
-                .ThrowAsJavaScriptException();
-            return env.Undefined();
-        }
-
         // Array of typeSubtypes
         std::vector<TypeSubtype> types;
         if (info[1].IsArray()) {
@@ -216,6 +207,19 @@ namespace nbs {
             }
         }
 
+        int steps;
+        try {
+            // Default is 1 if steps is undefined
+            if (std::isnan(steps)) {
+                steps = 1;
+            }
+            steps = info[2].As<Napi::Number>().Int64Value();
+        }
+        catch (const std::exception& ex) {
+            Napi::TypeError::New(env, std::string("invalid type for argument `step`: expected number") + ex.what())
+                .ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
 
         // Sort and step(+-) index to find the new timestamp.
         auto index_timestamp = this->index.nextTimestamp(timestamp, types, steps);
