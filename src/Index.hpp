@@ -119,7 +119,10 @@ namespace nbs {
 
             uint64_t best_timestamp = std::numeric_limits<uint64_t>::max();
             uint64_t best_delta     = std::numeric_limits<uint64_t>::max();
+            uint64_t earliest_found = std::numeric_limits<uint64_t>::max();
+            uint64_t latest_found   = std::numeric_limits<uint64_t>::min();
 
+            bool bestFound = false;  // If > 1 type, necessary to find earliest or latest timestamp for some edge cases.
             for (auto& range : matchingIndexItems) {
                 auto& begin = range.first;
                 auto& end   = range.second;
@@ -134,15 +137,22 @@ namespace nbs {
                             return a.item.timestamp < b.item.timestamp;
                         });
 
-                    // Prevent position traversing past begin or end iterators, return respective iterator timestamp.
-                    if (std::next(position, (steps - 1)) < begin) {
-                        return begin->item.timestamp;
+                    // // Prevent position going past begin or end, return respective iterator timestamp.
+                    // If timestamp precedes start.
+                    if (std::distance(begin, position) + (steps - 1) < 0) {
+                        if (begin->item.timestamp < earliest_found) {
+                            earliest_found = begin->item.timestamp;
+                            bestFound      = true;
+                        }
                     }
-
-                    else if (std::next(position, (steps - 1)) >= end) {
-                        return std::prev(end)->item.timestamp;
+                    // If timestamp exceeds maximum timestamp or is before the last element.
+                    else if (std::distance(begin, position) + (steps - 1) >= std::distance(begin, end)
+                             || (std::distance(position, end) + (steps - 1) == 1)) {
+                        if (std::prev(end)->item.timestamp > latest_found) {
+                            latest_found = std::prev(end)->item.timestamp;
+                            bestFound    = true;
+                        }
                     }
-
                     // Step position forward/backwards by x amount and save best_timestamp.
                     else if ((steps > 0 && std::distance(position, end) > steps)
                              || (steps < 0 && std::distance(begin, position) > abs(steps)) || (steps == 0)) {
@@ -154,6 +164,15 @@ namespace nbs {
                             best_timestamp = ts;
                         }
                     }
+                }
+            }
+            if (bestFound) {
+                // Sort through iterators to find the earliest or latest timestamp from within the group.
+                if (earliest_found != std::numeric_limits<uint64_t>::max()) {
+                    best_timestamp = earliest_found;
+                }
+                else {
+                    best_timestamp = latest_found;
                 }
             }
 

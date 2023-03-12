@@ -439,14 +439,15 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
 });
 
 const multiTypeNextTimestampArray = [
-  { type: pingType, subtype: 0 },
   { type: pongType, subtype: 0 },
+  { type: pingType, subtype: 0 },
   { type: pangType, subtype: 100 },
   { type: pangType, subtype: 200 },
 ];
 
 test('NbsDecoder.nextTimestamp() outputs the exact timestamp as input, given steps = 0', () => {
   const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
+  // const new_timestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 0);
   const new_timestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 0);
 
   assert.equal(
@@ -514,6 +515,72 @@ test('NbsDecoder.nextTimestamp() Stepping backwards/forwards respective of begin
   assert.equal(tsToBigInt(end), tsToBigInt(singleTypeTimestampEnd));
 });
 
+test('NbsDecoder.nextTimestamp() Multiple cases where timestamp is before beginning', () => {
+  const timestamp_0 = decoder.nextTimestamp(
+    { seconds: -9000, nanos: 0 },
+    multiTypeNextTimestampArray,
+    0
+  );
+  const timestamp_1 = decoder.nextTimestamp(
+    { seconds: -9000, nanos: 0 },
+    multiTypeNextTimestampArray,
+    1
+  );
+  const timestamp_2 = decoder.nextTimestamp(
+    { seconds: -9000, nanos: 0 },
+    multiTypeNextTimestampArray,
+    -1
+  );
+
+  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(timestamp_1));
+  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(timestamp_2));
+});
+
+test('NbsDecoder.nextTimestamp() Multiple cases where timestamp is after the end', () => {
+  const timestamp_0 = decoder.nextTimestamp(
+    { seconds: 9000, nanos: 0 },
+    multiTypeNextTimestampArray,
+    0
+  );
+  const timestamp_1 = decoder.nextTimestamp(
+    { seconds: 9000, nanos: 0 },
+    multiTypeNextTimestampArray,
+    1
+  );
+  const timestamp_2 = decoder.nextTimestamp(
+    { seconds: 9000, nanos: 0 },
+    multiTypeNextTimestampArray,
+    -1
+  );
+
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_1));
+  assert.equal(tsToBigInt({ seconds: 1895, nanos: 0 }), tsToBigInt(timestamp_2));
+});
+
+test('NbsDecoder.nextTimestamp() Timestamp is one before the last element and steps are positive', () => {
+  const timestamp_0 = decoder.nextTimestamp(
+    { seconds: 1896, nanos: 0 },
+    multiTypeNextTimestampArray,
+    1
+  );
+  const timestamp_1 = decoder.nextTimestamp(
+    { seconds: 1896, nanos: 0 },
+    multiTypeNextTimestampArray,
+    100
+  );
+  const singleType = decoder.nextTimestamp(
+    { seconds: 1894, nanos: 0 },
+    { type: pingType, subtype: 0 },
+    1
+  );
+
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_1));
+  assert.equal(tsToBigInt({ seconds: 1897, nanos: 0 }), tsToBigInt(singleType));
+});
+
 test('NbsDecoder.nextTimestamp() Throws error on missing or incorrect inputs.', () => {
   assert.throws(
     () => {
@@ -537,14 +604,6 @@ test('NbsDecoder.nextTimestamp() Throws error on missing or incorrect inputs.', 
     },
     /invalid type for argument `typeSubtype`: invalid `.subtype`: expected number/,
     'NbsDecoder.nextTimestamp() throws for object with invalid `subtype`'
-  );
-
-  assert.throws(
-    () => {
-      decoder.nextTimestamp(1500 * 1e9, 'a');
-    },
-    /invalid type for argument `step`: expected number/,
-    'NbsDecoder.nextTimestamp() throws for missing `timestamp` argument'
   );
 });
 

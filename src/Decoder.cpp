@@ -1,7 +1,6 @@
 #include "Decoder.hpp"
 
 #include <cmath>
-#include <iostream>
 #include <napi.h>
 #include <string>
 
@@ -209,7 +208,7 @@ namespace nbs {
 
         int steps;
         try {
-            // Default is 1 if steps is undefined
+            // If steps is undefined default = 1.
             if (std::isnan(steps)) {
                 steps = 1;
             }
