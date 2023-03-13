@@ -117,12 +117,10 @@ namespace nbs {
 
             auto matchingIndexItems = this->getIteratorsForTypes(types);  // Iterator for each type(s).
 
+            bool best_found         = false;
             uint64_t best_timestamp = std::numeric_limits<uint64_t>::max();
             uint64_t best_delta     = std::numeric_limits<uint64_t>::max();
-            uint64_t earliest_found = std::numeric_limits<uint64_t>::max();
-            uint64_t latest_found   = std::numeric_limits<uint64_t>::min();
 
-            bool bestFound = false;  // If > 1 type, necessary to find earliest or latest timestamp for some edge cases.
             for (auto& range : matchingIndexItems) {
                 auto& begin = range.first;
                 auto& end   = range.second;
@@ -137,27 +135,14 @@ namespace nbs {
                             return a.item.timestamp < b.item.timestamp;
                         });
 
-                    // // Prevent position going past begin or end, return respective iterator timestamp.
-                    // If timestamp precedes start.
-                    if (std::distance(begin, position) + (steps - 1) < 0) {
-                        if (begin->item.timestamp < earliest_found) {
-                            earliest_found = begin->item.timestamp;
-                            bestFound      = true;
-                        }
-                    }
-                    // If timestamp exceeds maximum timestamp or is before the last element.
-                    else if (std::distance(begin, position) + (steps - 1) >= std::distance(begin, end)
-                             || (std::distance(position, end) + (steps - 1) == 1)) {
-                        if (std::prev(end)->item.timestamp > latest_found) {
-                            latest_found = std::prev(end)->item.timestamp;
-                            bestFound    = true;
-                        }
-                    }
-                    // Step position forward/backwards by x amount and save best_timestamp.
-                    else if ((steps > 0 && std::distance(position, end) > steps)
-                             || (steps < 0 && std::distance(begin, position) > abs(steps)) || (steps == 0)) {
+                    int length = std::distance(begin, end);
+                    int target = std::distance(begin, position) - 1 + steps;
 
-                        auto ts        = std::next(position, (steps - 1))->item.timestamp;
+                    // Prevent position going past begin or end, return respective iterator timestamp.
+                    // If timestamp precedes start.
+                    if (0 <= target && target < length) {
+                        best_found     = true;
+                        auto ts        = std::next(begin, target)->item.timestamp;
                         uint64_t delta = steps > 0 ? ts - timestamp : timestamp - ts;
                         if (delta < best_delta) {
                             best_delta     = delta;
@@ -166,14 +151,22 @@ namespace nbs {
                     }
                 }
             }
-            if (bestFound) {
-                // Sort through iterators to find the earliest or latest timestamp from within the group.
-                if (earliest_found != std::numeric_limits<uint64_t>::max()) {
-                    best_timestamp = earliest_found;
+            if (!best_found) {
+                uint64_t min_timestamp = std::numeric_limits<uint64_t>::max();
+                uint64_t max_timestamp = std::numeric_limits<uint64_t>::min();
+                for (auto& range : matchingIndexItems) {
+                    auto& begin = range.first;
+                    auto& end   = range.second;
+                    if (begin != end) {
+                        min_timestamp = std::min(min_timestamp, begin->item.timestamp);
+                        max_timestamp = std::max(max_timestamp, std::prev(end)->item.timestamp);
+                    }
                 }
-                else {
-                    best_timestamp = latest_found;
+
+                if (steps == 0) {
+                    return timestamp > max_timestamp ? max_timestamp : min_timestamp;
                 }
+                return steps > 0 ? max_timestamp : min_timestamp;
             }
 
             return best_timestamp;
