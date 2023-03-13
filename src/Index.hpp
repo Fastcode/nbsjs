@@ -139,7 +139,6 @@ namespace nbs {
                     int target = std::distance(begin, position) - 1 + steps;
 
                     // Prevent position going past begin or end, return respective iterator timestamp.
-                    // If timestamp precedes start.
                     if (0 <= target && target < length) {
                         best_found     = true;
                         auto ts        = std::next(begin, target)->item.timestamp;
@@ -151,6 +150,7 @@ namespace nbs {
                     }
                 }
             }
+            // If no timestamp found, iterate through types and return min/max timestamp, respective of steps.
             if (!best_found) {
                 uint64_t min_timestamp = std::numeric_limits<uint64_t>::max();
                 uint64_t max_timestamp = std::numeric_limits<uint64_t>::min();

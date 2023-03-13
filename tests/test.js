@@ -575,11 +575,11 @@ test('NbsDecoder.nextTimestamp() Timestamp is one before the last element and st
 
 test('NbsDecoder.nextTimestamp() For single type. Timestamp is one before the last element and step = 1', () => {
   const timestamp_0 = decoder.nextTimestamp(
-    { seconds: 1898, nanos: 0 },
-    multiTypeNextTimestampArray,
+    { seconds: 1896, nanos: 0 },
+    { type: pingType, subtype: 0 },
     1
   );
-  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1897, nanos: 0 }), tsToBigInt(timestamp_0));
 });
 
 test('NbsDecoder.nextTimestamp() Throws error on missing or incorrect inputs.', () => {
