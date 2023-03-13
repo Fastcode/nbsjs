@@ -447,7 +447,6 @@ const multiTypeNextTimestampArray = [
 
 test('NbsDecoder.nextTimestamp() outputs the exact timestamp as input, given steps = 0', () => {
   const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
-  // const new_timestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 0);
   const new_timestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 0);
 
   assert.equal(
