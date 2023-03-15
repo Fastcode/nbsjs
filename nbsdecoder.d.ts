@@ -98,17 +98,16 @@ export declare class NbsDecoder {
   ): NbsPacket[];
 
   /**
-   *  Get the packets at (n) steps before or after the given timestamp for the given camera type(s).
+   * Get the timestamp to seek to such that all messages of the given types are stepped by (n) steps
    *
-   *  Returns a single timestamp of the specified camera type which is then used in the seek method.
-   *
-   * @param timestamp  The timestamp to get packets at.
-   * @param type  N types with subtype of camera object to get the timestamp.
-   * @param steps  Number of steps forwards or backwards to step away from current index.
-   * To determine forwards or backward direction negative numbers are used. */
+   * @param timestamp  The current timestamp to step from
+   * @param type       The type or array of types to step. If unspecified, all types will be stepped.
+   * @param steps      Number of steps to move forwards (positive number) or backwards (negative number).
+   *                   If 0 or unspecified, returns min or max timestamp matching the given types.
+   */
   public nextTimestamp(
     timestamp: number | BigInt | NbsTimestamp,
-    type: NbsTypeSubtype | NbsTypeSubtype[],
-    steps: number
+    type?: NbsTypeSubtype | NbsTypeSubtype[],
+    steps?: number
   ): NbsTimestamp;
 }

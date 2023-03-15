@@ -449,21 +449,21 @@ const [start, end] = decoder.getTimestampRange({ type: pingType, subtype: 0 });
 const timestampBeforeStart = { seconds: 0, nanos: 0 };
 const timestampAfterEnd = { seconds: 1900, nanos: 0 };
 
-test('NbsDecoder.nextTimestamp() outputs the timestamp of the most recent message when given steps = 0', () => {
-  const new_timestamp = decoder.nextTimestamp(
+test('NbsDecoder.nextTimestamp() return the timestamp from the most recent message when input steps = 0', () => {
+  const newTimestamp = decoder.nextTimestamp(
     { seconds: 1001, nanos: 0 },
     { type: pingType, subtype: 0 },
     0
   );
 
   assert.equal(
-    tsToBigInt(new_timestamp),
+    tsToBigInt(newTimestamp),
     tsToBigInt(start),
     'With steps = 0, input start timestamp should be equal to the returned timestamp for single type'
   );
 });
 
-test('NbsDecoder.nextTimestamp() Stepping forward by one timestamp returns a timestamp which is greater than input', () => {
+test('NbsDecoder.nextTimestamp() returns a timestamp which is greater than input when stepping forward by one timestamp', () => {
   const singleTypeTimestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 1);
   const multiTypeTimestamp = decoder.nextTimestamp(start, multiTypeNextTimestampArray, 1);
 
@@ -479,7 +479,7 @@ test('NbsDecoder.nextTimestamp() Stepping forward by one timestamp returns a tim
   );
 });
 
-test(`NbsDecoder.nextTimestamp() Stepping forward by five returns the expected timestamp`, () => {
+test(`NbsDecoder.nextTimestamp() returns the expected timestamp when stepping forward by five`, () => {
   const singleTypeTimestamp = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, 5);
   const multiTypeTimestamp = decoder.nextTimestamp(start, multiTypeNextTimestampArray, 5);
 
@@ -487,9 +487,8 @@ test(`NbsDecoder.nextTimestamp() Stepping forward by five returns the expected t
   assert.equal(tsToBigInt(multiTypeTimestamp), tsToBigInt({ seconds: 1013, nanos: 0 }));
 });
 
-test('NbsDecoder.nextTimestamp() Stepping backward returns a timestamp which is less than input', () => {
+test('NbsDecoder.nextTimestamp() returns a timestamp which is less than input when stepping backward', () => {
   const singleTypeTimestamp = decoder.nextTimestamp(end, { type: pingType, subtype: 0 }, -1);
-
   const multiTypeTimestamp = decoder.nextTimestamp(end, multiTypeNextTimestampArray, -1);
 
   assert.ok(
@@ -506,80 +505,76 @@ test('NbsDecoder.nextTimestamp() Stepping backward returns a timestamp which is 
   );
 });
 
-test('NbsDecoder.nextTimestamp() Stepping before the start returns the correct timestamp', () => {
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when stepping before the start of file', () => {
   const singleTypeTimestampStart = decoder.nextTimestamp(start, { type: pingType, subtype: 0 }, -1);
   assert.equal(tsToBigInt(start), tsToBigInt(singleTypeTimestampStart));
 });
 
-test('NbsDecoder.nextTimestamp() Stepping past the end returns the correct timestamp', () => {
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when stepping past the end', () => {
   const singleTypeTimestampEnd = decoder.nextTimestamp(end, { type: pingType, subtype: 0 }, 1);
 
   assert.equal(tsToBigInt(end), tsToBigInt(singleTypeTimestampEnd));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is before beginning and step = 0', () => {
-  const new_timestamp = decoder.nextTimestamp(timestampBeforeStart, multiTypeNextTimestampArray, 0);
+test('NbsDecoder.nextTimestamp() returns the start timestamp when input timestamp is before the beginning and step = 0', () => {
+  const newTimestamp = decoder.nextTimestamp(timestampBeforeStart, multiTypeNextTimestampArray, 0);
 
-  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(new_timestamp));
+  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is before the beginning and step = 1', () => {
-  const new_timestamp = decoder.nextTimestamp(timestampBeforeStart, multiTypeNextTimestampArray, 1);
-  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(new_timestamp));
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp is before the beginning and step = 1', () => {
+  const newTimestamp = decoder.nextTimestamp(timestampBeforeStart, multiTypeNextTimestampArray, 1);
+  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp()Timestamp is before the beginning and step = -1', () => {
-  const new_timestamp = decoder.nextTimestamp(
-    timestampBeforeStart,
-    multiTypeNextTimestampArray,
-    -1
-  );
+test('NbsDecoder.nextTimestamp()returns the expected timestamp when input timestamp is before the beginning and step = -1', () => {
+  const newTimestamp = decoder.nextTimestamp(timestampBeforeStart, multiTypeNextTimestampArray, -1);
 
-  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(new_timestamp));
+  assert.equal(tsToBigInt({ seconds: 1000, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is after the end and step = 0', () => {
-  const timestamp_0 = decoder.nextTimestamp(timestampAfterEnd, multiTypeNextTimestampArray, 0);
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp is after the end and step = 0', () => {
+  const newTimestamp = decoder.nextTimestamp(timestampAfterEnd, multiTypeNextTimestampArray, 0);
 
-  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is after the end and step = 1', () => {
-  const timestamp_1 = decoder.nextTimestamp(timestampAfterEnd, multiTypeNextTimestampArray, 1);
-  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_1));
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp is after the end and step = 1', () => {
+  const newTimestamp = decoder.nextTimestamp(timestampAfterEnd, multiTypeNextTimestampArray, 1);
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is after the end and step = -1', () => {
-  const timestamp_2 = decoder.nextTimestamp(timestampAfterEnd, multiTypeNextTimestampArray, -1);
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp timestamp is after the end and step = -1', () => {
+  const newTimestamp = decoder.nextTimestamp(timestampAfterEnd, multiTypeNextTimestampArray, -1);
 
-  assert.equal(tsToBigInt({ seconds: 1895, nanos: 0 }), tsToBigInt(timestamp_2));
+  assert.equal(tsToBigInt({ seconds: 1895, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is one before the last element and step = 1', () => {
-  const timestamp_0 = decoder.nextTimestamp(
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp is one before the last element and step = 1', () => {
+  const newTimestamp = decoder.nextTimestamp(
     { seconds: 1896, nanos: 0 },
     multiTypeNextTimestampArray,
     1
   );
-  assert.equal(tsToBigInt({ seconds: 1897, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1897, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() Timestamp is one before the last element and step = 100', () => {
-  const timestamp_1 = decoder.nextTimestamp(
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp is one before the last element and step = 100', () => {
+  const newTimestamp = decoder.nextTimestamp(
     { seconds: 1896, nanos: 0 },
     multiTypeNextTimestampArray,
     100
   );
-  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(timestamp_1));
+  assert.equal(tsToBigInt({ seconds: 1899, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
-test('NbsDecoder.nextTimestamp() For single type. Timestamp is one before the last element and step = 1', () => {
-  const timestamp_0 = decoder.nextTimestamp(
+test('NbsDecoder.nextTimestamp() returns the expected timestamp when input timestamp is one before the last element and step = 1, for a single type', () => {
+  const newTimestamp = decoder.nextTimestamp(
     { seconds: 1896, nanos: 0 },
     { type: pingType, subtype: 0 },
     1
   );
-  assert.equal(tsToBigInt({ seconds: 1897, nanos: 0 }), tsToBigInt(timestamp_0));
+  assert.equal(tsToBigInt({ seconds: 1897, nanos: 0 }), tsToBigInt(newTimestamp));
 });
 
 test('NbsDecoder.nextTimestamp() Throws error on missing or incorrect inputs.', () => {
