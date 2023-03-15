@@ -208,7 +208,7 @@ namespace nbs {
 
         int steps;
         try {
-            !info[2].IsUndefined() ? steps = info[2].As<Napi::Number>().Int64Value() : steps = 1;
+            steps = !info[2].IsUndefined() ? info[2].As<Napi::Number>().Int64Value() : 1;
         }
         catch (const std::exception& ex) {
             Napi::TypeError::New(env, std::string("invalid type for argument `step`: expected number") + ex.what())
