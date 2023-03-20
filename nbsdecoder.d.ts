@@ -96,4 +96,18 @@ export declare class NbsDecoder {
     timestamp: number | BigInt | NbsTimestamp,
     types: NbsTypeSubtype[]
   ): NbsPacket[];
+
+  /**
+   * Get the timestamp to seek to such that all messages of the given types are stepped by (n) steps
+   *
+   * @param timestamp  The current timestamp to step from
+   * @param type       The type or array of types to step. If unspecified, all types will be stepped.
+   * @param steps      Number of steps to move forwards (positive number) or backwards (negative number).
+   *                   If 0 or unspecified, returns min or max timestamp matching the given types.
+   */
+  public nextTimestamp(
+    timestamp: number | BigInt | NbsTimestamp,
+    type?: NbsTypeSubtype | NbsTypeSubtype[],
+    steps?: number
+  ): NbsTimestamp;
 }
