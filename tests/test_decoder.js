@@ -45,7 +45,6 @@ const pingType = Buffer.from('8ce1582fa0eadc84', 'hex'); // nuclear hash of 'mes
 const pongType = Buffer.from('37c56336526573bb', 'hex'); // nuclear hash of 'message.Pong'
 const pangType = Buffer.from('c63bd829ef39b750', 'hex'); // nuclear hash of 'message.Pang'
 
-
 test('NbsDecoder constructor throws for invalid arguments', () => {
   assert.throws(
     () => {
