@@ -59,7 +59,7 @@
                 [
                     'OS=="win"',
                     {
-                        "defines": ["_HAS_EXCEPTIONS=1"],
+                        "defines": ["_HAS_EXCEPTIONS=1", "NOMINMAX=1"],
                         "msvs_settings": {
                             "VCCLCompilerTool": {
                                 "AdditionalOptions": ["-std:c++14"],

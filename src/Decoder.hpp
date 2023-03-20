@@ -30,6 +30,8 @@ namespace nbs {
         /// Returns a JS array of packet objects
         Napi::Value GetPackets(const Napi::CallbackInfo& info);
 
+        Napi::Value NextTimestamp(const Napi::CallbackInfo& info);
+
     private:
         /// Holds the index for the nbs files loaded in this decoder
         Index index;

@@ -9,7 +9,6 @@
 #include "IndexItem.hpp"
 #include "TypeSubtype.hpp"
 #include "zstr/zstr.hpp"
-
 namespace nbs {
 
     class Index {
@@ -109,6 +108,70 @@ namespace nbs {
 
             return types;
         }
+
+
+        // Get timestamp where as many subtypes move forward without moving forward twice.
+        std::uint64_t nextTimestamp(const uint64_t& timestamp,
+                                    const std::vector<TypeSubtype>& types,
+                                    const int& steps) {
+
+            auto matchingIndexItems = this->getIteratorsForTypes(types);  // Iterator for each type(s).
+
+            bool best_found         = false;
+            uint64_t best_timestamp = std::numeric_limits<uint64_t>::max();
+            uint64_t best_delta     = std::numeric_limits<uint64_t>::max();
+
+            for (auto& range : matchingIndexItems) {
+                auto& begin = range.first;
+                auto& end   = range.second;
+
+                IndexItemFile target;
+                target.item.timestamp = timestamp;
+
+                if (begin != end) {
+                    // Find the first item with a timestamp greater than the requested timestamp.
+                    auto position =
+                        std::upper_bound(begin, end, target, [](const IndexItemFile& a, const IndexItemFile& b) {
+                            return a.item.timestamp < b.item.timestamp;
+                        });
+
+                    int length = std::distance(begin, end);
+                    int target = std::distance(begin, position) - 1 + steps;
+
+                    // Prevent position going past begin or end, return respective iterator timestamp.
+                    if (0 <= target && target < length) {
+                        best_found     = true;
+                        auto ts        = std::next(begin, target)->item.timestamp;
+                        uint64_t delta = steps > 0 ? ts - timestamp : timestamp - ts;
+                        if (delta < best_delta) {
+                            best_delta     = delta;
+                            best_timestamp = ts;
+                        }
+                    }
+                }
+            }
+            // If no timestamp found, iterate through types and return min/max timestamp, respective of steps.
+            if (!best_found) {
+                uint64_t min_timestamp = std::numeric_limits<uint64_t>::max();
+                uint64_t max_timestamp = std::numeric_limits<uint64_t>::min();
+                for (auto& range : matchingIndexItems) {
+                    auto& begin = range.first;
+                    auto& end   = range.second;
+                    if (begin != end) {
+                        min_timestamp = std::min(min_timestamp, begin->item.timestamp);
+                        max_timestamp = std::max(max_timestamp, std::prev(end)->item.timestamp);
+                    }
+                }
+
+                if (steps == 0) {
+                    return timestamp > max_timestamp ? max_timestamp : min_timestamp;
+                }
+                return steps > 0 ? max_timestamp : min_timestamp;
+            }
+
+            return best_timestamp;
+        }
+
 
         /// Get the first and last timestamps across all items in the index
         std::pair<uint64_t, uint64_t> getTimestampRange() {
