@@ -140,17 +140,15 @@ namespace nbs {
         };
 #pragma pack(pop)
 
-        // Build the packet
+        // Build the header section of the packet
         std::vector<uint8_t> packetBytes(sizeof(PacketHeader), '\0');
-
-        // Placement new the header to put the data in
         new (packetBytes.data()) PacketHeader(size, timestampMicros, packet.type);
 
-        // Load the data into the packet
+        // Append the payload bytes to the packet
         const auto* data = reinterpret_cast<const uint8_t*>(packet.payload);
         packetBytes.insert(packetBytes.end(), data, data + packet.length);
 
-        // Write out the packet
+        // Write out the packet to the nbs file
         outputFile.get()->write(reinterpret_cast<const char*>(packetBytes.data()), int64_t(packetBytes.size()));
 
         return packetBytes.size();
@@ -184,11 +182,12 @@ namespace nbs {
         };
 #pragma pack(pop)
 
-        std::vector<uint8_t> headerBytes(sizeof(PacketIndex), '\0');
-        new (headerBytes.data()) PacketIndex(packet.type, packet.subtype, packet.timestamp, bytesWritten, size);
+        // Create byte data for the index
+        std::vector<uint8_t> indexBytes(sizeof(PacketIndex), '\0');
+        new (indexBytes.data()) PacketIndex(packet.type, packet.subtype, packet.timestamp, bytesWritten, size);
 
-        // Write out the header
-        indexFile.get()->write(reinterpret_cast<const char*>(headerBytes.data()), int64_t(headerBytes.size()));
+        // Write out the index to the index file
+        indexFile.get()->write(reinterpret_cast<const char*>(indexBytes.data()), int64_t(indexBytes.size()));
     }
 
 }  // namespace nbs
