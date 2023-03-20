@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
-    "test": "node tests/test.js",
+    "test": "uvu tests",
     "format": "prettier --write \"*.{js,ts,json,md}\" \".github/**/*.{js,yml}\" \"tests/*.js\"",
     "format:check": "prettier --check \"*.{js,ts,json,md}\" \".github/**/*.{js,yml}\" \"tests/*.js\""
   },
