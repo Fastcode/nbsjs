@@ -3,7 +3,7 @@ const path = require('path');
 const { test } = require('uvu');
 const assert = require('uvu/assert');
 
-const { NbsDecoder } = require('../nbsdecoder');
+const { NbsDecoder } = require('..');
 
 /** Convert the given timestamp object to a BigInt of nanoseconds */
 function tsToBigInt(ts) {

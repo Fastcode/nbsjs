@@ -3,7 +3,7 @@ const { test } = require('uvu');
 const tmp = require('tmp');
 const assert = require('uvu/assert');
 
-const { NbsDecoder, NbsEncoder } = require('../nbsdecoder');
+const { NbsDecoder, NbsEncoder } = require('..');
 
 const pingType = Buffer.from('8ce1582fa0eadc84', 'hex'); // nuclear hash of 'message.Ping'
 const pongType = Buffer.from('37c56336526573bb', 'hex'); // nuclear hash of 'message.Pong'
