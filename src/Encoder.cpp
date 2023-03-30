@@ -6,25 +6,65 @@
 
 namespace nbs {
 
+    /**
+     * This represents the part of the NBS packet before the payload
+     *
+     * NBS File Packet Format
+     * Name      | Type               |  Description
+     * ------------------------------------------------------------
+     * header    | char[3]            | NBS packet header ☢ { 0xE2, 0x98, 0xA2 }
+     * length    | uint32_t           | Length of this packet after this value
+     * timestamp | uint64_t           | Timestamp the data was emitted in microseconds
+     * hash      | uint64_t           | the 64bit hash for the payload type
+     * payload   | char[length - 16]  | the data payload
+     */
+    struct PacketHeader {
+        std::array<char, 3> header = {char(0xE2), char(0x98), char(0xA2)};
+        uint32_t size;
+        uint64_t timestamp;
+        uint64_t hash;
+
+        PacketHeader(const uint32_t& size, const uint64_t& timestamp, const uint64_t& hash)
+            : size(size), timestamp(timestamp), hash(hash){};
+    } __attribute__((packed));
+
+    /**
+     * NBS Index File Format
+     * Name      | Type               |  Description
+     * ------------------------------------------------------------
+     * hash      | uint64_t           | the 64bit hash for the payload type
+     * subtype   | uint32_t           | the id field of the payload
+     * timestamp | uint64_t           | Timestamp of the message or the emit timestamp in nanoseconds
+     * offset    | uint64_t           | offset to start of radiation symbol ☢
+     * size      | uint32_t           | Size of the whole packet from the radiation symbol
+     */
+    struct PacketIndex {
+        uint64_t hash{0};
+        uint32_t subtype{0};
+        uint64_t timestamp{0};
+        uint64_t offset{0};
+        uint32_t size{0};
+
+        PacketIndex(const uint64_t& hash,
+                    const uint32_t& subtype,
+                    const uint64_t& timestamp,
+                    const uint64_t& offset,
+                    const uint32_t& size)
+            : hash(hash), subtype(subtype), timestamp(timestamp), offset(offset), size(size){};
+    } __attribute__((packed));
+
     Napi::Object Encoder::Init(Napi::Env& env, Napi::Object& exports) {
 
-        Napi::Function func =
-            DefineClass(env,
-                        "Encoder",
-                        {
-                            InstanceMethod<&Encoder::Write>(
-                                "write",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Encoder::GetBytesWritten>(
-                                "getBytesWritten",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Encoder::Close>(
-                                "close",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Encoder::IsOpen>(
-                                "isOpen",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                        });
+        Napi::Function func = DefineClass(
+            env,
+            "Encoder",
+            {
+                InstanceMethod<&Encoder::Write>("write", napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Encoder::GetBytesWritten>("getBytesWritten",
+                                                          napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Encoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Encoder::IsOpen>("isOpen", napi_property_attributes(napi_writable | napi_configurable)),
+            });
 
         Napi::FunctionReference* constructor = new Napi::FunctionReference();
 
@@ -89,8 +129,8 @@ namespace nbs {
         }
 
         // Calculate the NBS Packet's full size
-        uint32_t size = WritePacket(packet);
-        WriteIndex(packet, size);
+        uint32_t size = writePacket(packet);
+        writeIndex(packet, size);
 
         bytesWritten += size;
 
@@ -102,7 +142,7 @@ namespace nbs {
     }
 
     void Encoder::Close(const Napi::CallbackInfo& info) {
-        if (this->IsOpen(info).As<Napi::Boolean>()) {
+        if (this->outputFile.get()->is_open()) {
             this->outputFile.get()->close();
             this->indexFile.get()->close();
         }
@@ -112,33 +152,11 @@ namespace nbs {
         return Napi::Boolean::New(info.Env(), this->outputFile.get()->is_open());
     }
 
-    uint64_t Encoder::WritePacket(const Packet& packet) {
-
-        // NBS File Format
-        // Name      | Type               |  Description
-        // ------------------------------------------------------------
-        // header    | char[3]            | NBS packet header ☢ { 0xE2, 0x98, 0xA2 }
-        // length    | uint32_t           | Length of this packet after this value
-        // timestamp | uint64_t           | Timestamp the data was emitted in microseconds
-        // hash      | uint64_t           | the 64bit hash for the payload type
-        // payload   | char[length - 16]  | the data payload
+    uint64_t Encoder::writePacket(const Packet& packet) {
 
         // The size of our output timestamp, hash and data
-        uint32_t size = sizeof(packet.timestamp) + sizeof(packet.type) + packet.length;
-
+        uint32_t size            = sizeof(packet.timestamp) + sizeof(packet.type) + packet.length;
         uint64_t timestampMicros = packet.timestamp / 1000;
-
-#pragma pack(push, 1)
-        struct PacketHeader {
-            std::array<char, 3> header = {char(0xE2), char(0x98), char(0xA2)};
-            uint32_t size{0};
-            uint64_t timestamp{0};
-            uint64_t hash{0};
-
-            PacketHeader(const uint32_t& size, const uint64_t& timestamp, const uint64_t& hash)
-                : size(size), timestamp(timestamp), hash(hash){};
-        };
-#pragma pack(pop)
 
         // Build the header section of the packet
         std::vector<uint8_t> packetBytes(sizeof(PacketHeader), '\0');
@@ -154,33 +172,7 @@ namespace nbs {
         return packetBytes.size();
     }
 
-    void Encoder::WriteIndex(const Packet& packet, const uint32_t& size) {
-
-        // NBS Index File Format
-        // Name      | Type               |  Description
-        // ------------------------------------------------------------
-        // hash      | uint64_t           | the 64bit hash for the payload type
-        // subtype   | uint32_t           | the id field of the payload
-        // timestamp | uint64_t           | Timestamp of the message or the emit timestamp in nanoseconds
-        // offset    | uint64_t           | offset to start of radiation symbol ☢
-        // size      | uint32_t           | Size of the whole packet from the radiation symbol
-
-#pragma pack(push, 1)
-        struct PacketIndex {
-            uint64_t hash{0};
-            uint32_t subtype{0};
-            uint64_t timestamp{0};
-            uint64_t offset{0};
-            uint32_t size{0};
-
-            PacketIndex(const uint64_t& hash,
-                        const uint32_t& subtype,
-                        const uint64_t& timestamp,
-                        const uint64_t& offset,
-                        const uint32_t& size)
-                : hash(hash), subtype(subtype), timestamp(timestamp), offset(offset), size(size){};
-        };
-#pragma pack(pop)
+    void Encoder::writeIndex(const Packet& packet, const uint32_t& size) {
 
         // Create byte data for the index
         std::vector<uint8_t> indexBytes(sizeof(PacketIndex), '\0');

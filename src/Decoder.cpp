@@ -117,7 +117,7 @@ namespace nbs {
         for (size_t i = 0; i < availableTypes.size(); i++) {
             auto jsType = Napi::Object::New(env);
 
-            jsType.Set("type", Hash::ToJsValue(availableTypes[i].type, env));
+            jsType.Set("type", hash::ToJsValue(availableTypes[i].type, env));
             jsType.Set("subtype", Napi::Number::New(env, availableTypes[i].subtype));
 
             jsTypes[i] = jsType;
@@ -149,8 +149,8 @@ namespace nbs {
         auto jsRange = Napi::Array::New(env, 2);
 
         size_t i       = 0;
-        jsRange[i + 0] = Timestamp::ToJsValue(range.first, env);
-        jsRange[i + 1] = Timestamp::ToJsValue(range.second, env);
+        jsRange[i + 0] = timestamp::ToJsValue(range.first, env);
+        jsRange[i + 1] = timestamp::ToJsValue(range.second, env);
 
         return jsRange;
     }
@@ -160,7 +160,7 @@ namespace nbs {
 
         uint64_t timestamp = 0;
         try {
-            timestamp = Timestamp::FromJsValue(info[0], env);
+            timestamp = timestamp::FromJsValue(info[0], env);
         }
         catch (const std::exception& ex) {
             Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
@@ -222,7 +222,7 @@ namespace nbs {
         auto index_timestamp = this->index.nextTimestamp(timestamp, types, steps);
 
         // Convert timestamp back to Napi format and return.
-        auto new_timestamp = Timestamp::ToJsValue(index_timestamp, env).As<Napi::Number>();
+        auto new_timestamp = timestamp::ToJsValue(index_timestamp, env).As<Napi::Number>();
         return new_timestamp;
     }
 
@@ -232,7 +232,7 @@ namespace nbs {
         uint64_t timestamp = 0;
 
         try {
-            timestamp = Timestamp::FromJsValue(info[0], env);
+            timestamp = timestamp::FromJsValue(info[0], env);
         }
         catch (const std::exception& ex) {
             Napi::TypeError::New(env, std::string("invalid type for argument `timestamp`: ") + ex.what())
@@ -276,8 +276,8 @@ namespace nbs {
         for (size_t i = 0; i < packets.size(); i++) {
             auto jsPacket = Napi::Object::New(env);
 
-            jsPacket.Set("timestamp", Timestamp::ToJsValue(packets[i].timestamp, env));
-            jsPacket.Set("type", Hash::ToJsValue(packets[i].type, env));
+            jsPacket.Set("timestamp", timestamp::ToJsValue(packets[i].timestamp, env));
+            jsPacket.Set("type", hash::ToJsValue(packets[i].type, env));
             jsPacket.Set("subtype", Napi::Number::New(env, packets[i].subtype));
 
             if (packets[i].payload == nullptr) {
@@ -364,7 +364,7 @@ namespace nbs {
         uint64_t type = 0;
 
         try {
-            type = Hash::FromJsValue(typeSubtype.Get("type"), env);
+            type = hash::FromJsValue(typeSubtype.Get("type"), env);
         }
         catch (const std::exception& ex) {
             throw std::runtime_error("invalid `.type`: " + std::string(ex.what()));

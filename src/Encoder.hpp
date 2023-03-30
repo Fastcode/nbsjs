@@ -33,9 +33,9 @@ namespace nbs {
         /// The total number of bytes written to the nbs file so far
         uint64_t bytesWritten{0};
 
-        uint64_t WritePacket(const Packet& packet);
+        uint64_t writePacket(const Packet& packet);
 
-        void WriteIndex(const Packet& packet, const uint32_t& size);
+        void writeIndex(const Packet& packet, const uint32_t& size);
     };
 }  // namespace nbs
 
