@@ -3,7 +3,7 @@
 
 namespace nbs {
 
-    Napi::Value& Packet::ToJsValue(const Packet& packet, const Napi::Env& env) {
+    Napi::Value Packet::ToJsValue(const Packet& packet, const Napi::Env& env) {
         auto jsPacket = Napi::Object::New(env);
 
         jsPacket.Set("timestamp", timestamp::ToJsValue(packet.timestamp, env));
@@ -20,7 +20,7 @@ namespace nbs {
         return jsPacket;
     }
 
-    Packet& Packet::FromJsValue(const Napi::Value& jsPacket, const Napi::Env& env) {
+    Packet Packet::FromJsValue(const Napi::Value& jsPacket, const Napi::Env& env) {
 
         if (!jsPacket.IsObject()) {
             throw std::runtime_error("expected packet object");
