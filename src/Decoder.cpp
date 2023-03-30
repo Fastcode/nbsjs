@@ -269,25 +269,11 @@ namespace nbs {
             return env.Undefined();
         }
 
-        auto packets = this->GetMatchingPackets(timestamp, types);
-
+        auto packets   = this->GetMatchingPackets(timestamp, types);
         auto jsPackets = Napi::Array::New(env, packets.size());
 
         for (size_t i = 0; i < packets.size(); i++) {
-            auto jsPacket = Napi::Object::New(env);
-
-            jsPacket.Set("timestamp", timestamp::ToJsValue(packets[i].timestamp, env));
-            jsPacket.Set("type", hash::ToJsValue(packets[i].type, env));
-            jsPacket.Set("subtype", Napi::Number::New(env, packets[i].subtype));
-
-            if (packets[i].payload == nullptr) {
-                jsPacket.Set("payload", env.Undefined());
-            }
-            else {
-                jsPacket.Set("payload", Napi::Buffer<uint8_t>::Copy(env, packets[i].payload, packets[i].length));
-            }
-
-            jsPackets[i] = jsPacket;
+            jsPackets[i] = Packet::ToJsValue(packets[i], env);
         }
 
         return jsPackets;

@@ -25,9 +25,11 @@ namespace nbs {
         /// The length of the payload in bytes (excluding the header)
         uint32_t length;
 
+        static Napi::Value& ToJsValue(const Packet& packet, const Napi::Env& env);
+
         /// Convert the given JS value to a timestamp in nanoseconds.
         /// The JS value must contain the `timestamp`, `type`, `subtype` and `payload` properties.
-        static Packet FromJsValue(const Napi::Value jsPacket, const Napi::Env& env);
+        static Packet& FromJsValue(const Napi::Value& jsPacket, const Napi::Env& env);
     };
 
 }  // namespace nbs
