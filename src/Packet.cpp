@@ -35,11 +35,13 @@ namespace nbs {
         if (!jsObject.Has("type")) {
             throw std::runtime_error("expected object with `type` key");
         }
-        if (!jsObject.Has("subtype")) {
-            throw std::runtime_error("expected object with `subtype` key");
-        }
         if (!jsObject.Has("payload")) {
             throw std::runtime_error("expected object with `payload` key");
+        }
+
+        uint32_t subtype = 0;
+        if (jsObject.Has("subtype")) {
+            subtype = jsObject.Get("subtype").As<Napi::Number>().Uint32Value();
         }
 
         // Check types are valid
@@ -67,7 +69,6 @@ namespace nbs {
         }
 
         auto payloadBuffer = jsObject.Get("payload").As<Napi::Buffer<uint8_t>>();
-        auto subtype       = jsObject.Get("subtype").As<Napi::Number>().Uint32Value();
 
         Packet packet;
         packet.timestamp = timestamp;

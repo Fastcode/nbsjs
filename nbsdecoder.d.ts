@@ -29,6 +29,23 @@ export interface NbsPacket {
 }
 
 /**
+ * An NBS packet to write to an NBS file
+ */
+export interface WritePacket {
+  /** The NBS packet timestamp */
+  timestamp: NbsTimestamp;
+
+  /** The XX64 hash of the packet type */
+  type: Buffer;
+
+  /** The packet subtype */
+  subtype?: number;
+
+  /** The packet data */
+  payload: Buffer;
+}
+
+/**
  * A (type, subtype) pair that uniquely identifies a specific type of message
  */
 export interface NbsTypeSubtype {
@@ -125,7 +142,7 @@ export declare class NbsEncoder {
    *
    * @param packet Packet to write to the file
    */
-  public write(packet: NbsPacket): number;
+  public write(packet: WritePacket): number;
 
   /**
    * Get the total number of bytes written to the nbs file.

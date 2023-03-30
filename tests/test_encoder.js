@@ -63,17 +63,6 @@ test('NbsEncoder write throws for invalid arguments', () => {
       encoder.write({
         timestamp: { seconds: 1897, nanos: 0 },
         type: pingType,
-      });
-    },
-    /invalid type for argument `packet`: expected object with `subtype` key/,
-    'NbsEncoder write() throws without subtype in packet'
-  );
-
-  assert.throws(
-    () => {
-      encoder.write({
-        timestamp: { seconds: 1897, nanos: 0 },
-        type: pingType,
         subtype: 0,
       });
     },
