@@ -25,16 +25,26 @@ namespace nbs {
         /// The length of the payload in bytes (excluding the header)
         uint32_t length;
 
-        /// Convert the given packet to a JS Napi value.
-        /// The returned value will contain properties for `timestamp`, `type`, `subtype` and `payload`.
-        static Napi::Value ToJsValue(const Packet& packet, const Napi::Env& env);
-
-        /// Convert the given JS value to a timestamp in nanoseconds.
-        /// The JS value must contain the `timestamp`, `type`, `subtype` and `payload` properties.
-        ///
-        /// The payload of the resulting packet will point to JS managed memory, so it may be cleared if
-        /// the JS packet is cleaned up.
+        /**
+         * Convert the given JS value to a Packet instance.
+         *
+         * The payload of the resulting packet will point to JS managed memory, so it may be cleared
+         * externally if the JS packet is cleaned up.
+         *
+         * @param jsPacket JS packet object containing keys `timestamp`, `type`, `subtype`, `payload`.
+         * @param env      JS environment.
+         * @return         Packet instance created from the JS value.
+         */
         static Packet FromJsValue(const Napi::Value& jsPacket, const Napi::Env& env);
+
+        /**
+         * Create a JS packet from a Packet instance.
+         *
+         * @param packet Packet to convert to a JS packet.
+         * @param env    JS environment.
+         * @return       JS Object containing keys `timestamp`, `type`, `subtype`, and `payload`
+         */
+        static Napi::Value ToJsValue(const Packet& packet, const Napi::Env& env);
     };
 
 }  // namespace nbs

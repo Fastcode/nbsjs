@@ -10,24 +10,48 @@
 namespace nbs {
     class Encoder : public Napi::ObjectWrap<Encoder> {
     public:
-        /// Initialize Encoder class NAPI binding
+        /**
+         * Initialize Encoder class NAPI binding
+         */
         static Napi::Object Init(Napi::Env& env, Napi::Object& exports);
 
-        /// Constructor: takes a file path to write to
+        /**
+         * Create a new Encoder for an nbs file.
+         *
+         * @param info JS request containing a string as first argument,
+         *             representing the path of the file to write to.
+         */
         Encoder(const Napi::CallbackInfo& info);
 
-        /// Writes an NBS packet to the file.
-        /// Takes a WritePacket and returns the total number of bytes
-        /// written to the file over all packets.
+        /**
+         * Writes an NBS packet to the file.
+         *
+         * @param info JS request containing packet as first argument.
+         * @return     The total number of bytes written to the NBS file.
+         */
         Napi::Value Write(const Napi::CallbackInfo& info);
 
-        /// Returns the total number of bytes written to the file.
+        /**
+         * Returns the total number of bytes written to the file.
+         *
+         * @param info JS request. Does not require any arguments.
+         * @return     Total number of bytes written to the NBS file.
+         */
         Napi::Value GetBytesWritten(const Napi::CallbackInfo& info);
 
-        /// Closes the file being written to.
+        /**
+         * Closes the writer to NBS file and its index file.
+         *
+         * @param info JS request. Does not require any arguments.
+         */
         void Close(const Napi::CallbackInfo& info);
 
-        /// Returns whether or not the file being written to is still open
+        /**
+         * Checks if the file being written to is still open.
+         *
+         * @param info JS request. Does not require any arguments.
+         * @return     Boolean value indicating if the file is still open.
+         */
         Napi::Value IsOpen(const Napi::CallbackInfo& info);
 
     private:
