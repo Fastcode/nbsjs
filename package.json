@@ -37,7 +37,8 @@
   "gypfile": true,
   "devDependencies": {
     "prettier": "^2.5.1",
-    "uvu": "^0.5.3"
+    "uvu": "^0.5.3",
+    "tmp": "^0.2.1"
   },
   "dependencies": {
     "bindings": "^1.5.0",
