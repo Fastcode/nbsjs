@@ -58,7 +58,7 @@ const packet = {
   // The nuclear hash of the message type name (In this example 'message.Ping')
   type: Buffer.from('8ce1582fa0eadc84', 'hex'),
 
-  // Subtype of the packet
+  // Optional subtype of the packet
   subtype: 0,
 
   // Bytes of the payload
