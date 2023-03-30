@@ -10,8 +10,6 @@ const pongType = Buffer.from('37c56336526573bb', 'hex'); // nuclear hash of 'mes
 
 tmp.setGracefulCleanup();
 tmp.dir((_, dir, __) => {
-  console.log(dir);
-
   test('NbsEncoder constructor throws for invalid arguments', () => {
     assert.throws(
       () => {
@@ -31,7 +29,7 @@ tmp.dir((_, dir, __) => {
   });
 
   test('NbsEncoder write throws for invalid arguments', () => {
-    const file = path.join(dir, "output.nbs")
+    const file = path.join(dir, 'output.nbs');
     const encoder = new NbsEncoder(file);
 
     assert.throws(
@@ -113,7 +111,7 @@ tmp.dir((_, dir, __) => {
   });
 
   test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
-    const file = path.join(dir, "output.nbs")
+    const file = path.join(dir, 'output.nbs');
     const encoder = new NbsEncoder(file);
 
     const pingPacket = {
