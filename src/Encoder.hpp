@@ -13,28 +13,40 @@ namespace nbs {
         /// Initialize Encoder class NAPI binding
         static Napi::Object Init(Napi::Env& env, Napi::Object& exports);
 
+        /// Constructor: takes a file path to write to
         Encoder(const Napi::CallbackInfo& info);
 
+        /// Writes an NBS packet to the file.
+        /// Takes a WritePacket and returns the total number of bytes
+        /// written to the file over all packets.
         Napi::Value Write(const Napi::CallbackInfo& info);
 
+        /// Returns the total number of bytes written to the file.
         Napi::Value GetBytesWritten(const Napi::CallbackInfo& info);
 
+        /// Closes the file being written to.
         void Close(const Napi::CallbackInfo& info);
 
+        /// Returns whether or not the file being written to is still open
         Napi::Value IsOpen(const Napi::CallbackInfo& info);
 
     private:
         /// The size of the radiation symbol at the start of each packet
         static constexpr int HEADER_SIZE = 3;
+
         /// The nbs file being written to
         std::unique_ptr<std::ofstream> outputFile;
+
         /// The index file of the nbs file being written to
         std::unique_ptr<zstr::ofstream> indexFile;
+
         /// The total number of bytes written to the nbs file so far
         uint64_t bytesWritten{0};
 
+        /// Write the packet to the output nbs file
         uint64_t writePacket(const Packet& packet);
 
+        /// Write the index of a packet to the output index file
         void writeIndex(const Packet& packet, const uint32_t& size);
     };
 }  // namespace nbs

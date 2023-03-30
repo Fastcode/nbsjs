@@ -75,7 +75,7 @@ namespace nbs {
         packet.type      = type;
         packet.subtype   = subtype;
         packet.length    = payloadBuffer.ByteLength();
-        packet.payload   = payloadBuffer.Data();
+        packet.payload   = payloadBuffer.Data();  // Pointer to external JS managed memory
 
         return packet;
     }

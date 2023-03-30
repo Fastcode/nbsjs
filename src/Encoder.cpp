@@ -118,6 +118,9 @@ namespace nbs {
             return env.Undefined();
         }
 
+        // This packet instance's payload points to JS managed memory.
+        // This is safe to do here since the packet becomes out of scope
+        // and is cleaned up when this method finished.
         Packet packet;
         try {
             packet = Packet::FromJsValue(info[0], env);

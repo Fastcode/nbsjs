@@ -9,6 +9,9 @@ const pingType = Buffer.from('8ce1582fa0eadc84', 'hex'); // nuclear hash of 'mes
 const pongType = Buffer.from('37c56336526573bb', 'hex'); // nuclear hash of 'message.Pong'
 
 tmp.setGracefulCleanup();
+
+// Use a temp dir here so created nbs files and their index files are all cleaned
+// up on exit.
 tmp.dir((_, dir, __) => {
   test('NbsEncoder constructor throws for invalid arguments', () => {
     assert.throws(
