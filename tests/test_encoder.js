@@ -1,6 +1,7 @@
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { test } = require('uvu');
-const tmp = require('tmp');
 const assert = require('uvu/assert');
 
 const { NbsDecoder, NbsEncoder } = require('..');
@@ -8,30 +9,35 @@ const { NbsDecoder, NbsEncoder } = require('..');
 const pingType = Buffer.from('8ce1582fa0eadc84', 'hex'); // nuclear hash of 'message.Ping'
 const pongType = Buffer.from('37c56336526573bb', 'hex'); // nuclear hash of 'message.Pong'
 
-tmp.setGracefulCleanup();
+function usingTempDir(callback) {
+  const tempDir = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+  try {
+    callback(tempDir);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true });
+  }
+}
 
-// Use a temp dir here so created nbs files and their index files are all cleaned
-// up on exit.
-tmp.dir((_, dir, __) => {
-  test('NbsEncoder constructor throws for invalid arguments', () => {
-    assert.throws(
-      () => {
-        new NbsEncoder();
-      },
-      /missing argument `path`: provide a path to write to/,
-      'NbsEncoder() constructor throws without path argument'
-    );
+test('NbsEncoder constructor throws for invalid arguments', () => {
+  assert.throws(
+    () => {
+      new NbsEncoder();
+    },
+    /missing argument `path`: provide a path to write to/,
+    'NbsEncoder() constructor throws without path argument'
+  );
 
-    assert.throws(
-      () => {
-        new NbsEncoder(1);
-      },
-      /invalid argument `path`: expected string/,
-      'NbsEncoder() constructor throws with incorrect type for path argument'
-    );
-  });
+  assert.throws(
+    () => {
+      new NbsEncoder(1);
+    },
+    /invalid argument `path`: expected string/,
+    'NbsEncoder() constructor throws with incorrect type for path argument'
+  );
+});
 
-  test('NbsEncoder write throws for invalid arguments', () => {
+test('NbsEncoder write throws for invalid arguments', () => {
+  usingTempDir((dir) => {
     const file = path.join(dir, 'output.nbs');
     const encoder = new NbsEncoder(file);
 
@@ -112,8 +118,10 @@ tmp.dir((_, dir, __) => {
       'NbsEncoder write() throws with incorrect types for timestamp properties'
     );
   });
+});
 
-  test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
+test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
+  usingTempDir((dir) => {
     const file = path.join(dir, 'output.nbs');
     const encoder = new NbsEncoder(file);
 
@@ -141,6 +149,6 @@ tmp.dir((_, dir, __) => {
     assert.equal(packets[0], pingPacket);
     assert.equal(packets[1], pongPacket);
   });
-
-  test.run();
 });
+
+test.run();
