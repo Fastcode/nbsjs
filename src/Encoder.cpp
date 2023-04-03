@@ -1,5 +1,6 @@
 #include "Encoder.hpp"
 
+#include <array>
 #include <napi.h>
 
 #include "Packet.hpp"
