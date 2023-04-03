@@ -41,11 +41,11 @@ namespace nbs {
      * size      | uint32_t           | Size of the whole packet from the radiation symbol
      */
     struct PacketIndex {
-        uint64_t hash{0};
-        uint32_t subtype{0};
-        uint64_t timestamp{0};
-        uint64_t offset{0};
-        uint32_t size{0};
+        uint64_t hash;
+        uint32_t subtype;
+        uint64_t timestamp;
+        uint64_t offset;
+        uint32_t size;
 
         PacketIndex(const uint64_t& hash,
                     const uint32_t& subtype,
