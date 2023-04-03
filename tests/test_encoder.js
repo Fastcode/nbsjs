@@ -14,7 +14,7 @@ function usingTempDir(callback) {
   try {
     callback(tempDir);
   } finally {
-    fs.rmSync(tempDir, { recursive: true,  });
+    fs.rmSync(tempDir, { recursive: true });
   }
 }
 
