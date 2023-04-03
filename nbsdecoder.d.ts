@@ -31,7 +31,7 @@ export interface NbsPacket {
 /**
  * An NBS packet to write to an NBS file
  */
-export interface WritePacket {
+export interface NbsWritePacket {
   /** The NBS packet timestamp */
   timestamp: NbsTimestamp;
 
@@ -142,7 +142,7 @@ export declare class NbsEncoder {
    *
    * @param packet Packet to write to the file
    */
-  public write(packet: WritePacket): number;
+  public write(packet: NbsWritePacket): number;
 
   /**
    * Get the total number of bytes written to the nbs file.
