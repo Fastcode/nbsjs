@@ -131,7 +131,7 @@ namespace nbs {
             return env.Undefined();
         }
 
-        // Calculate the NBS Packet's full size
+        // Write the NBS Packet and get the full size as written
         uint32_t size = writePacket(packet);
         writeIndex(packet, size);
 

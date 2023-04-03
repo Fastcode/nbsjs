@@ -36,7 +36,7 @@ test('NbsEncoder constructor throws for invalid arguments', () => {
   );
 });
 
-test('NbsEncoder write throws for invalid arguments', () => {
+test('NbsEncoder.write() throws for invalid arguments', () => {
   usingTempDir((dir) => {
     const file = path.join(dir, 'output.nbs');
     const encoder = new NbsEncoder(file);
@@ -46,7 +46,7 @@ test('NbsEncoder write throws for invalid arguments', () => {
         encoder.write();
       },
       /missing argument `packet`: provide a packet to write to the file/,
-      'NbsEncoder write() throws without packet argument'
+      'NbsEncoder.write() throws without packet argument'
     );
 
     assert.throws(

@@ -24,7 +24,7 @@ namespace nbs {
         Encoder(const Napi::CallbackInfo& info);
 
         /**
-         * Writes an NBS packet to the file.
+         * Write an NBS packet to the file.
          *
          * @param info JS request containing packet as first argument.
          * @return     The total number of bytes written to the NBS file.
@@ -32,7 +32,7 @@ namespace nbs {
         Napi::Value Write(const Napi::CallbackInfo& info);
 
         /**
-         * Returns the total number of bytes written to the file.
+         * Get the total number of bytes written to the file.
          *
          * @param info JS request. Does not require any arguments.
          * @return     Total number of bytes written to the NBS file.
@@ -40,14 +40,14 @@ namespace nbs {
         Napi::Value GetBytesWritten(const Napi::CallbackInfo& info);
 
         /**
-         * Closes the writer to NBS file and its index file.
+         * Close the writer to NBS file and its index file.
          *
          * @param info JS request. Does not require any arguments.
          */
         void Close(const Napi::CallbackInfo& info);
 
         /**
-         * Checks if the file being written to is still open.
+         * Check if the file being written to is still open.
          *
          * @param info JS request. Does not require any arguments.
          * @return     Boolean value indicating if the file is still open.
