@@ -150,6 +150,7 @@ test('Packets written by NbsEncoder can be read by NbsDecoder', () => {
     assert.equal(packets.length, 2);
     assert.equal(packets[0], pingPacket);
     assert.equal(packets[1], pongPacket);
+    decoder.close();
   });
 });
 

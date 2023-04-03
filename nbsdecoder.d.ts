@@ -127,6 +127,11 @@ export declare class NbsDecoder {
     type?: NbsTypeSubtype | NbsTypeSubtype[],
     steps?: number
   ): NbsTimestamp;
+
+  /**
+   * Close the readers for the NBS files.
+   */
+  public close(): void;
 }
 
 export declare class NbsEncoder {

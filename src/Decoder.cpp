@@ -13,23 +13,22 @@
 namespace nbs {
 
     Napi::Object Decoder::Init(Napi::Env& env, Napi::Object& exports) {
-        Napi::Function func =
-            DefineClass(env,
-                        "Decoder",
-                        {
-                            InstanceMethod<&Decoder::GetAvailableTypes>(
-                                "getAvailableTypes",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Decoder::GetTimestampRange>(
-                                "getTimestampRange",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Decoder::GetPackets>(
-                                "getPackets",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                            InstanceMethod<&Decoder::NextTimestamp>(
-                                "nextTimestamp",
-                                static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
-                        });
+        Napi::Function func = DefineClass(
+            env,
+            "Decoder",
+            {
+                InstanceMethod<&Decoder::GetAvailableTypes>(
+                    "getAvailableTypes",
+                    napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::GetTimestampRange>(
+                    "getTimestampRange",
+                    napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::GetPackets>("getPackets",
+                                                     napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::NextTimestamp>("nextTimestamp",
+                                                        napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
+            });
 
         Napi::FunctionReference* constructor = new Napi::FunctionReference();
 
@@ -366,6 +365,12 @@ namespace nbs {
         }
 
         return {type, subtype};
+    }
+
+    void Decoder::Close(const Napi::CallbackInfo& info) {
+        for (auto& map : memoryMaps) {
+            map.unmap();
+        }
     }
 
 }  // namespace nbs
