@@ -54,7 +54,7 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
         encoder.write({});
       },
       /invalid type for argument `packet`: expected object with `timestamp` key/,
-      'NbsEncoder write() throws without timestamp in packet'
+      'NbsEncoder.write() throws without timestamp in packet'
     );
 
     assert.throws(
@@ -64,7 +64,7 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
         });
       },
       /invalid type for argument `packet`: expected object with `type` key/,
-      'NbsEncoder write() throws without type in packet'
+      'NbsEncoder.write() throws without type in packet'
     );
 
     assert.throws(
@@ -76,7 +76,7 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
         });
       },
       /invalid type for argument `packet`: expected object with `payload` key/,
-      'NbsEncoder write() throws without payload in packet'
+      'NbsEncoder.write() throws without payload in packet'
     );
 
     assert.throws(
@@ -89,7 +89,7 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
         });
       },
       /invalid type for argument `packet`: error in `timestamp`: expected positive number or BigInt or timestamp object/,
-      'NbsEncoder write() throws with incorrect type for timestamp'
+      'NbsEncoder.write() throws with incorrect type for timestamp'
     );
 
     assert.throws(
@@ -102,7 +102,7 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
         });
       },
       /invalid type for argument `packet`: error in `timestamp`: expected object with `seconds` and `nanos` keys/,
-      'NbsEncoder write() throws for incorrect keys in timestamp'
+      'NbsEncoder.write() throws for incorrect keys in timestamp'
     );
 
     assert.throws(
@@ -115,7 +115,7 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
         });
       },
       /invalid type for argument `packet`: error in `timestamp`: `seconds` and `nanos` must be numbers/,
-      'NbsEncoder write() throws with incorrect types for timestamp properties'
+      'NbsEncoder.write() throws with incorrect types for timestamp properties'
     );
 
     encoder.close();

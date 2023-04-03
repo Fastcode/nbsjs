@@ -33,7 +33,7 @@ namespace nbs {
         Napi::Value NextTimestamp(const Napi::CallbackInfo& info);
 
         /**
-         * Close the readers to NBS files this decoder's nbs files.
+         * Close the readers to this decoder's nbs files.
          *
          * @param info JS request. Does not require any arguments.
          */
