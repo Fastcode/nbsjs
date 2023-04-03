@@ -19,7 +19,7 @@ namespace nbs {
      * hash      | uint64_t           | the 64bit hash for the payload type
      * payload   | char[length - 16]  | the data payload
      */
-    struct PacketHeader {
+    struct __attribute__((__packed__)) PacketHeader {
         std::array<char, 3> header = {char(0xE2), char(0x98), char(0xA2)};
         uint32_t size;
         uint64_t timestamp;
@@ -27,7 +27,7 @@ namespace nbs {
 
         PacketHeader(const uint32_t& size, const uint64_t& timestamp, const uint64_t& hash)
             : size(size), timestamp(timestamp), hash(hash){};
-    } __attribute__((packed));
+    };
 
     /**
      * NBS Index File Format
@@ -39,7 +39,7 @@ namespace nbs {
      * offset    | uint64_t           | offset to start of radiation symbol ☢
      * size      | uint32_t           | Size of the whole packet from the radiation symbol
      */
-    struct PacketIndex {
+    struct __attribute__((__packed__)) PacketIndex {
         uint64_t hash{0};
         uint32_t subtype{0};
         uint64_t timestamp{0};
@@ -52,7 +52,7 @@ namespace nbs {
                     const uint64_t& offset,
                     const uint32_t& size)
             : hash(hash), subtype(subtype), timestamp(timestamp), offset(offset), size(size){};
-    } __attribute__((packed));
+    };
 
     Napi::Object Encoder::Init(Napi::Env& env, Napi::Object& exports) {
 
