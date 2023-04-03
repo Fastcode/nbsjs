@@ -14,7 +14,7 @@ function usingTempDir(callback) {
   try {
     callback(tempDir);
   } finally {
-    fs.rmSync(tempDir, { recursive: true });
+    fs.rmSync(tempDir, { recursive: true,  });
   }
 }
 
@@ -117,6 +117,8 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
       /invalid type for argument `packet`: error in `timestamp`: `seconds` and `nanos` must be numbers/,
       'NbsEncoder write() throws with incorrect types for timestamp properties'
     );
+
+    encoder.close();
   });
 });
 
