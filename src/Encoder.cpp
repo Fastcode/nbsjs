@@ -7,6 +7,7 @@
 
 namespace nbs {
 
+#pragma pack(push, 1)
     /**
      * This represents the part of the NBS packet before the payload
      *
@@ -19,7 +20,7 @@ namespace nbs {
      * hash      | uint64_t           | the 64bit hash for the payload type
      * payload   | char[length - 16]  | the data payload
      */
-    struct __attribute__((__packed__)) PacketHeader {
+    struct PacketHeader {
         std::array<char, 3> header = {char(0xE2), char(0x98), char(0xA2)};
         uint32_t size;
         uint64_t timestamp;
@@ -39,7 +40,7 @@ namespace nbs {
      * offset    | uint64_t           | offset to start of radiation symbol ☢
      * size      | uint32_t           | Size of the whole packet from the radiation symbol
      */
-    struct __attribute__((__packed__)) PacketIndex {
+    struct PacketIndex {
         uint64_t hash{0};
         uint32_t subtype{0};
         uint64_t timestamp{0};
@@ -53,6 +54,7 @@ namespace nbs {
                     const uint32_t& size)
             : hash(hash), subtype(subtype), timestamp(timestamp), offset(offset), size(size){};
     };
+#pragma pack(pop)
 
     Napi::Object Encoder::Init(Napi::Env& env, Napi::Object& exports) {
 
