@@ -32,6 +32,13 @@ namespace nbs {
 
         Napi::Value NextTimestamp(const Napi::CallbackInfo& info);
 
+        /**
+         * Close the readers to this decoder's nbs files.
+         *
+         * @param info JS request. Does not require any arguments.
+         */
+        void Close(const Napi::CallbackInfo& info);
+
     private:
         /// Holds the index for the nbs files loaded in this decoder
         Index index;
@@ -45,20 +52,6 @@ namespace nbs {
 
         /// Read the packet for the given index item
         Packet Read(const IndexItemFile& item);
-
-        /// Create a XX64 hash from the given JS value, which could be a string or a buffer.
-        /// String values will be hashed, and buffers will be interpreted as a XX64 hash.
-        uint64_t HashFromJsValue(const Napi::Value& jsHash, const Napi::Env& env);
-
-        /// Convert the given XX64 hash to a JS Buffer value
-        Napi::Value HashToJsValue(const uint64_t& hash, const Napi::Env& env);
-
-        /// Convert the given JS value to a timestamp in nanoseconds.
-        /// The JS value can be a number, BigInt, or an object with `seconds` and `nanos` properties.
-        uint64_t TimestampFromJsValue(const Napi::Value& jsTimestamp, const Napi::Env& env);
-
-        /// Convert the given timestamp to a JS object with `seconds` and `nanos` properties
-        Napi::Value TimestampToJsValue(const uint64_t& timestamp, const Napi::Env& env);
 
         /// Convert the given JS object with `type` and `subtype` properties to a TypeSubtype struct
         TypeSubtype TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env);

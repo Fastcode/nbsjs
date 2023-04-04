@@ -5,3 +5,4 @@ const binding = bindings({
 });
 
 module.exports.NbsDecoder = binding.Decoder;
+module.exports.NbsEncoder = binding.Encoder;
