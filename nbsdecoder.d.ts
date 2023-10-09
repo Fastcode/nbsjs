@@ -29,6 +29,23 @@ export interface NbsPacket {
 }
 
 /**
+ * An NBS packet to write to an NBS file
+ */
+export interface NbsWritePacket {
+  /** The NBS packet timestamp */
+  timestamp: NbsTimestamp;
+
+  /** The XX64 hash of the packet type */
+  type: Buffer;
+
+  /** The packet subtype */
+  subtype?: number;
+
+  /** The packet data */
+  payload: Buffer;
+}
+
+/**
  * A (type, subtype) pair that uniquely identifies a specific type of message
  */
 export interface NbsTypeSubtype {
@@ -110,4 +127,40 @@ export declare class NbsDecoder {
     type?: NbsTypeSubtype | NbsTypeSubtype[],
     steps?: number
   ): NbsTimestamp;
+
+  /**
+   * Close the readers for the NBS files.
+   */
+  public close(): void;
+}
+
+export declare class NbsEncoder {
+  /**
+   * Create a new NbsEncoder instance
+   *
+   * @param path Absolute path of the nbs file to write to.
+   */
+  public constructor(path: string);
+
+  /**
+   * Write a packet to the nbs file.
+   *
+   * @param packet Packet to write to the file
+   */
+  public write(packet: NbsWritePacket): number;
+
+  /**
+   * Get the total number of bytes written to the nbs file.
+   */
+  public getBytesWritten(): BigInt;
+
+  /**
+   * Close the writers for both the nbs file and its index file.
+   */
+  public close(): void;
+
+  /**
+   * Returns true if the file writer to the nbs file is open.
+   */
+  public isOpen(): boolean;
 }
