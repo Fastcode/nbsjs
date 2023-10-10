@@ -52,9 +52,6 @@ namespace nbs {
 
         /// Read the packet for the given index item
         Packet Read(const IndexItemFile& item);
-
-        /// Convert the given JS object with `type` and `subtype` properties to a TypeSubtype struct
-        TypeSubtype TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env);
     };
 
 }  // namespace nbs

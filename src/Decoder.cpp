@@ -132,7 +132,7 @@ namespace nbs {
 
         if (info.Length() > 0) {
             try {
-                auto typeSubtype = this->TypeSubtypeFromJsValue(info[0], env);
+                auto typeSubtype = TypeSubtype::FromJsValue(info[0], env);
                 range            = this->index.getTimestampRange(typeSubtype);
             }
             catch (const std::exception& ex) {
@@ -170,24 +170,15 @@ namespace nbs {
         // Array of typeSubtypes
         std::vector<TypeSubtype> types;
         if (info[1].IsArray()) {
-            auto argTypes = info[1].As<Napi::Array>();
-
-            // Get the types and subtypes
-            for (std::size_t i = 0; i < argTypes.Length(); i++) {
-                auto item = argTypes.Get(i);
-
                 try {
-                    auto typeSubtype = this->TypeSubtypeFromJsValue(item, env);
-                    types.push_back(typeSubtype);
+                types = TypeSubtype::FromJsArray(info[1], env);
                 }
-
                 catch (const std::exception& ex) {
-                    Napi::TypeError::New(env, "invalid item type in `types` array: " + std::string(ex.what()))
+                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
                         .ThrowAsJavaScriptException();
                     return env.Undefined();
                 }
             }
-        }
         else if (info[1].IsUndefined()) {
             types = this->index.getTypes();
         }
@@ -195,7 +186,7 @@ namespace nbs {
         // Single type
         else {
             try {
-                types.push_back(this->TypeSubtypeFromJsValue(info[1], env));
+                types.push_back(TypeSubtype::FromJsValue(info[1], env));
             }
             catch (const std::exception& ex) {
                 Napi::TypeError::New(
@@ -242,23 +233,15 @@ namespace nbs {
         std::vector<TypeSubtype> types;
 
         if (info[1].IsArray()) {
-            auto argTypes = info[1].As<Napi::Array>();
-
-            // Get the types and subtypes
-            for (std::size_t i = 0; i < argTypes.Length(); i++) {
-                auto item = argTypes.Get(i);
-
                 try {
-                    auto typeSubtype = this->TypeSubtypeFromJsValue(item, env);
-                    types.push_back(typeSubtype);
+                types = TypeSubtype::FromJsArray(info[1], env);
                 }
                 catch (const std::exception& ex) {
-                    Napi::TypeError::New(env, "invalid item type in `types` array: " + std::string(ex.what()))
+                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
                         .ThrowAsJavaScriptException();
                     return env.Undefined();
                 }
             }
-        }
         else if (info[1].IsUndefined()) {
             types = this->index.getTypes();
         }
@@ -333,38 +316,6 @@ namespace nbs {
         packet.length  = item.item.length - headerLength;
 
         return packet;
-    }
-
-    TypeSubtype Decoder::TypeSubtypeFromJsValue(const Napi::Value& jsTypeSubtype, const Napi::Env& env) {
-        if (!jsTypeSubtype.IsObject()) {
-            throw std::runtime_error("expected object");
-        }
-
-        auto typeSubtype = jsTypeSubtype.As<Napi::Object>();
-
-        if (!typeSubtype.Has("type") || !typeSubtype.Has("subtype")) {
-            throw std::runtime_error("expected object with `type` and `subtype` keys");
-        }
-
-        uint64_t type = 0;
-
-        try {
-            type = hash::FromJsValue(typeSubtype.Get("type"), env);
-        }
-        catch (const std::exception& ex) {
-            throw std::runtime_error("invalid `.type`: " + std::string(ex.what()));
-        }
-
-        uint32_t subtype = 0;
-
-        if (typeSubtype.Get("subtype").IsNumber()) {
-            subtype = typeSubtype.Get("subtype").As<Napi::Number>().Uint32Value();
-        }
-        else {
-            throw std::runtime_error("invalid `.subtype`: expected number");
-        }
-
-        return {type, subtype};
     }
 
     void Decoder::Close(const Napi::CallbackInfo& info) {
