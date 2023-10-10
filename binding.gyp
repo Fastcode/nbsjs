@@ -9,6 +9,7 @@
                 "src/Hash.cpp",
                 "src/Packet.cpp",
                 "src/Timestamp.cpp",
+                "src/TypeSubtype.cpp",
                 "src/xxhash/xxhash.c",
             ],
             "cflags": [],
