@@ -35,14 +35,8 @@ namespace nbs {
         return {type, subtype};
     }
 
-    std::vector<TypeSubtype> TypeSubtype::FromJsArray(const Napi::Value& jsValue, const Napi::Env& env) {
-        if (!jsValue.IsArray()) {
-            throw std::runtime_error("expected an array");
-        }
+    std::vector<TypeSubtype> TypeSubtype::FromJsArray(const Napi::Array& jsArray, const Napi::Env& env) {
         
-        // Convert value to array
-        auto jsArray = jsValue.As<Napi::Array>();
-
         // Vector for return values
         std::vector<TypeSubtype> types;
 

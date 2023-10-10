@@ -119,7 +119,7 @@ export declare class NbsDecoder {
    * 
    * @param types 
    */
-  public getAllPackets(types: NbsTypeSubtype[]): NbsPacket[];
+  public getAllPackets(types?: NbsTypeSubtype[]): NbsPacket[];
 
   /**
    * Get the timestamp to seek to such that all messages of the given types are stepped by (n) steps

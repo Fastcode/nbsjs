@@ -173,7 +173,7 @@ namespace nbs {
         std::vector<TypeSubtype> types;
         if (info[1].IsArray()) {
             try {
-                types = TypeSubtype::FromJsArray(info[1], env);
+                types = TypeSubtype::FromJsArray(info[1].As<Napi::Array>(), env);
             }
             catch (const std::exception& ex) {
                 Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
@@ -236,7 +236,7 @@ namespace nbs {
 
         if (info[1].IsArray()) {
             try {
-                types = TypeSubtype::FromJsArray(info[1], env);
+                types = TypeSubtype::FromJsArray(info[1].As<Napi::Array>(), env);
             }
             catch (const std::exception& ex) {
                 Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
@@ -269,11 +269,21 @@ namespace nbs {
 
         std::vector<TypeSubtype> types;
 
-        try {
-            types = TypeSubtype::FromJsArray(info[0], env);
+        if (info[0].IsArray()) {
+            try {
+                types = TypeSubtype::FromJsArray(info[0].As<Napi::Array>(), env);
+            }
+            catch (const std::exception& ex) {
+                Napi::TypeError::New(env, std::string("invalid type for argument `types`: ") + ex.what())
+                    .ThrowAsJavaScriptException();
+                return env.Undefined();
+            }
+        } 
+        else if (info[0].IsUndefined()) {
+            types = this->index.getTypes();
         }
-        catch (const std::exception& ex) {
-            Napi::TypeError::New(env, std::string("invalid type for argument `types`: ") + ex.what())
+        else {
+            Napi::TypeError::New(env, "invalid type for argument `types`: expected array or undefined")
                 .ThrowAsJavaScriptException();
             return env.Undefined();
         }
