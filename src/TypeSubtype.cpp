@@ -49,5 +49,4 @@ namespace nbs {
 
         return types;
     }
-
 }

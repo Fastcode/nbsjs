@@ -301,7 +301,6 @@ namespace nbs {
             }
         }
 
-
         // Convert the packets to JS values
         auto jsPackets = Napi::Array::New(env, packets.size());
 
