@@ -438,6 +438,67 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
   });
 });
 
+test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
+  // Invalid `types` argument
+  assert.throws(
+    () => {
+      decoder.getAllPackets(false);
+    },
+    /invalid type for argument `types`: expected array or undefined/,
+    'NbsDecoder.getAllPackets() throws for missing incorrect `types` argument type'
+  );
+
+  // Invalid item in `types` array
+  assert.throws(
+    () => {
+      decoder.getAllPackets([false]);
+    },
+    /invalid type for argument `types`: invalid item in array: expected object/,
+    'NbsDecoder.getAllPackets() throws for invalid argument type'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getAllPackets([{}]);
+    },
+    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    'NbsDecoder.getAllPackets() throws for object without `type` or `subtype` keys'
+  );
+
+  // Invalid type, subtype object in `types` array
+  assert.throws(
+    () => {
+      decoder.getAllPackets([{ type: 'some-type' }]);
+    },
+    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    'NbsDecoder.getAllPackets() throws for object without `subtype` key'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getAllPackets([{ subtype: 0 }]);
+    },
+    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    'NbsDecoder.getAllPackets() throws for object without `type` key'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getAllPackets([{ type: false, subtype: 0 }]);
+    },
+    /invalid type for argument `types`: invalid item in array: invalid `.type`: expected a string or Buffer/,
+    'NbsDecoder.getAllPackets() throws for object with invalid `type`'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getAllPackets([{ type: 'some-type', subtype: false }]);
+    },
+    /invalid type for argument `types`: invalid item in array: invalid `.subtype`: expected number/,
+    'NbsDecoder.getAllPackets() throws for object with invalid `subtype`'
+  );
+});
+
 const multiTypeNextTimestampArray = [
   { type: pongType, subtype: 0 },
   { type: pingType, subtype: 0 },
