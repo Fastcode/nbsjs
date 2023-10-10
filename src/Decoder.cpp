@@ -25,6 +25,8 @@ namespace nbs {
                     napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::GetPackets>("getPackets",
                                                      napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::GetAllPackets>("getAllPackets",
+                                                     napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::NextTimestamp>("nextTimestamp",
                                                         napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
@@ -170,15 +172,15 @@ namespace nbs {
         // Array of typeSubtypes
         std::vector<TypeSubtype> types;
         if (info[1].IsArray()) {
-                try {
+            try {
                 types = TypeSubtype::FromJsArray(info[1], env);
-                }
-                catch (const std::exception& ex) {
-                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
-                        .ThrowAsJavaScriptException();
-                    return env.Undefined();
-                }
             }
+            catch (const std::exception& ex) {
+                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
+                    .ThrowAsJavaScriptException();
+                return env.Undefined();
+            }
+        }
         else if (info[1].IsUndefined()) {
             types = this->index.getTypes();
         }
@@ -233,15 +235,15 @@ namespace nbs {
         std::vector<TypeSubtype> types;
 
         if (info[1].IsArray()) {
-                try {
+            try {
                 types = TypeSubtype::FromJsArray(info[1], env);
-                }
-                catch (const std::exception& ex) {
-                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
-                        .ThrowAsJavaScriptException();
-                    return env.Undefined();
-                }
             }
+            catch (const std::exception& ex) {
+                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
+                    .ThrowAsJavaScriptException();
+                return env.Undefined();
+            }
+        }
         else if (info[1].IsUndefined()) {
             types = this->index.getTypes();
         }
@@ -252,6 +254,42 @@ namespace nbs {
         }
 
         auto packets   = this->GetMatchingPackets(timestamp, types);
+        auto jsPackets = Napi::Array::New(env, packets.size());
+
+        for (size_t i = 0; i < packets.size(); i++) {
+            jsPackets[i] = Packet::ToJsValue(packets[i], env);
+        }
+
+        return jsPackets;
+    }
+
+    Napi::Value Decoder::GetAllPackets(const Napi::CallbackInfo& info) {
+
+        Napi::Env env = info.Env();
+
+        std::vector<TypeSubtype> types;
+
+        try {
+            types = TypeSubtype::FromJsArray(info[0], env);
+        }
+        catch (const std::exception& ex) {
+            Napi::TypeError::New(env, std::string("invalid type for argument `types`: ") + ex.what())
+                .ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+
+        std::vector<Packet> packets;
+        auto matchingIndexItems = this->index.getIteratorsForTypes(types);
+
+        for (auto& iteratorPair : matchingIndexItems) {
+            auto& begin = iteratorPair.first;
+            auto& end   = iteratorPair.second;
+
+            for (auto current = begin; current != end; current++) {
+                packets.push_back(this->Read(*current));
+            }
+        }
+
         auto jsPackets = Napi::Array::New(env, packets.size());
 
         for (size_t i = 0; i < packets.size(); i++) {

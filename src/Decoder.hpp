@@ -30,6 +30,10 @@ namespace nbs {
         /// Returns a JS array of packet objects
         Napi::Value GetPackets(const Napi::CallbackInfo& info);
 
+        /// Get a list of all packets in the file matching the given list of types and subtypes
+        /// Returns a JS array of packet objects
+        Napi::Value GetAllPackets(const Napi::CallbackInfo& info);
+
         Napi::Value NextTimestamp(const Napi::CallbackInfo& info);
 
         /**

@@ -115,6 +115,13 @@ export declare class NbsDecoder {
   ): NbsPacket[];
 
   /**
+   * Get all packets in the loaded nbs file of the given types.
+   * 
+   * @param types 
+   */
+  public getAllPackets(types: NbsTypeSubtype[]): NbsPacket[];
+
+  /**
    * Get the timestamp to seek to such that all messages of the given types are stepped by (n) steps
    *
    * @param timestamp  The current timestamp to step from
