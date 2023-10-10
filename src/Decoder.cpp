@@ -288,18 +288,21 @@ namespace nbs {
             return env.Undefined();
         }
 
-        std::vector<Packet> packets;
+        // Get the iterators for each type
         auto matchingIndexItems = this->index.getIteratorsForTypes(types);
 
-        for (auto& iteratorPair : matchingIndexItems) {
-            auto& begin = iteratorPair.first;
-            auto& end   = iteratorPair.second;
+        // Container for output packets
+        std::vector<Packet> packets;
 
-            for (auto current = begin; current != end; current++) {
+        // Read every packet from each iterator
+        for (auto& iteratorPair : matchingIndexItems) {
+            for (auto current = iteratorPair.first; current != iteratorPair.second; current++) {
                 packets.push_back(this->Read(*current));
             }
         }
 
+
+        // Convert the packets to JS values
         auto jsPackets = Napi::Array::New(env, packets.size());
 
         for (size_t i = 0; i < packets.size(); i++) {
