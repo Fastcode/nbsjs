@@ -37,14 +37,12 @@ namespace nbs {
 
     std::vector<TypeSubtype> TypeSubtype::FromJsArray(const Napi::Array& jsArray, const Napi::Env& env) {
 
-        // Vector for return values
+        // Container for return values
         std::vector<TypeSubtype> types;
 
+        // Attempt to convert each value to TypeSubtype
         for (std::size_t i = 0; i < jsArray.Length(); i++) {
-            // Attempt to convert each value to TypeSubtype
-            auto item = jsArray.Get(i);
-            auto typeSubtype = TypeSubtype::FromJsValue(item, env);
-            types.push_back(typeSubtype);
+            types.push_back(TypeSubtype::FromJsValue(jsArray.Get(i), env));
         }
 
         return types;
