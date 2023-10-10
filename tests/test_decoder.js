@@ -499,6 +499,39 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
   );
 });
 
+test('NbsDecoder.getAllPackets() returns all packets when no types specified', () => {
+  const packets = decoder.getAllPackets();
+  assert.equal(packets.length, 900);
+});
+
+test('NbsDecoder.getAllPackets() returns all the packets for a single type', () => {
+  const packets = decoder.getAllPackets([{ type: pongType, subtype: 0 }]);
+  assert.equal(packets.length, 300);
+});
+
+test('NbsDecoder.getAllPackets() returns all the packets for a multiple types', () => {
+  const types = [
+    { type: pongType, subtype: 0 }, 
+    { type: pingType, subtype: 0 }
+  ]
+  const packets = decoder.getAllPackets(types);
+  assert.equal(packets.length, 600);
+});
+
+test('NbsDecoder.getAllPackets() returns all the packets for a type with multiple subtypes', () => {
+  const types = [
+    { type: pangType, subtype: 100 }, 
+    { type: pangType, subtype: 200 }
+  ]
+  const packets = decoder.getAllPackets(types);
+  assert.equal(packets.length, 300);
+});
+
+test('NbsDecoder.getAllPackets() returns empty array when given an empty array of types', () => {
+  const packets = decoder.getAllPackets([]);
+  assert.equal(packets.length, 0);
+})
+
 const multiTypeNextTimestampArray = [
   { type: pongType, subtype: 0 },
   { type: pingType, subtype: 0 },
