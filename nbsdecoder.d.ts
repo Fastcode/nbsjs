@@ -115,9 +115,12 @@ export declare class NbsDecoder {
   ): NbsPacket[];
 
   /**
-   * Get all packets in the loaded nbs file of the given types.
+   * Get all packets in the loaded nbs file of the given types. If a set of types is not given, all
+   * packets in the file will be returned. If an empty array of types is given, an empty array of
+   * packets will be returned.
    * 
-   * @param types 
+   * @param types The array of types to get all the packet of. If unspecified, all packets in the file 
+   *              will be returned.
    */
   public getAllPackets(types?: NbsTypeSubtype[]): NbsPacket[];
 
