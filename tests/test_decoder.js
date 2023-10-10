@@ -209,7 +209,7 @@ test('NbsDecoder.getPackets() throws for invalid arguments', () => {
     () => {
       decoder.getPackets(0, [false]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object/,
+    /invalid item type in `types` array: expected object/,
     'NbsDecoder.getPackets() throws for invalid argument type'
   );
 
@@ -217,7 +217,7 @@ test('NbsDecoder.getPackets() throws for invalid arguments', () => {
     () => {
       decoder.getPackets(0, [{}]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    /invalid item type in `types` array: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getPackets() throws for object without `type` or `subtype` keys'
   );
 
@@ -226,7 +226,7 @@ test('NbsDecoder.getPackets() throws for invalid arguments', () => {
     () => {
       decoder.getPackets(0, [{ type: 'some-type' }]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    /invalid item type in `types` array: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getPackets() throws for object without `subtype` key'
   );
 
@@ -234,7 +234,7 @@ test('NbsDecoder.getPackets() throws for invalid arguments', () => {
     () => {
       decoder.getPackets(0, [{ subtype: 0 }]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    /invalid item type in `types` array: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getPackets() throws for object without `type` key'
   );
 
@@ -242,7 +242,7 @@ test('NbsDecoder.getPackets() throws for invalid arguments', () => {
     () => {
       decoder.getPackets(0, [{ type: false, subtype: 0 }]);
     },
-    /invalid type for argument `types`: invalid item in array: invalid `.type`: expected a string or Buffer/,
+    /invalid item type in `types` array: invalid `.type`: expected a string or Buffer/,
     'NbsDecoder.getPackets() throws for object with invalid `type`'
   );
 
@@ -250,7 +250,7 @@ test('NbsDecoder.getPackets() throws for invalid arguments', () => {
     () => {
       decoder.getPackets(0, [{ type: 'some-type', subtype: false }]);
     },
-    /invalid type for argument `types`: invalid item in array: invalid `.subtype`: expected number/,
+    /invalid item type in `types` array: invalid `.subtype`: expected number/,
     'NbsDecoder.getPackets() throws for object with invalid `subtype`'
   );
 });
@@ -453,7 +453,7 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
     () => {
       decoder.getAllPackets([false]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object/,
+    /invalid item type in `types` array: expected object/,
     'NbsDecoder.getAllPackets() throws for invalid argument type'
   );
 
@@ -461,7 +461,7 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
     () => {
       decoder.getAllPackets([{}]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    /invalid item type in `types` array: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getAllPackets() throws for object without `type` or `subtype` keys'
   );
 
@@ -470,7 +470,7 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
     () => {
       decoder.getAllPackets([{ type: 'some-type' }]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    /invalid item type in `types` array: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getAllPackets() throws for object without `subtype` key'
   );
 
@@ -478,7 +478,7 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
     () => {
       decoder.getAllPackets([{ subtype: 0 }]);
     },
-    /invalid type for argument `types`: invalid item in array: expected object with `type` and `subtype` keys/,
+    /invalid item type in `types` array: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getAllPackets() throws for object without `type` key'
   );
 
@@ -486,7 +486,7 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
     () => {
       decoder.getAllPackets([{ type: false, subtype: 0 }]);
     },
-    /invalid type for argument `types`: invalid item in array: invalid `.type`: expected a string or Buffer/,
+    /invalid item type in `types` array: invalid `.type`: expected a string or Buffer/,
     'NbsDecoder.getAllPackets() throws for object with invalid `type`'
   );
 
@@ -494,7 +494,7 @@ test('NbsDecoder.getAllPackets throws for invalid arguments', () => {
     () => {
       decoder.getAllPackets([{ type: 'some-type', subtype: false }]);
     },
-    /invalid type for argument `types`: invalid item in array: invalid `.subtype`: expected number/,
+    /invalid item type in `types` array: invalid `.subtype`: expected number/,
     'NbsDecoder.getAllPackets() throws for object with invalid `subtype`'
   );
 });

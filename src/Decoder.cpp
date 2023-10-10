@@ -239,7 +239,7 @@ namespace nbs {
                 types = TypeSubtype::FromJsArray(info[1].As<Napi::Array>(), env);
             }
             catch (const std::exception& ex) {
-                Napi::TypeError::New(env, "invalid type for argument `types`: " + std::string(ex.what()))
+                Napi::TypeError::New(env, "invalid item type in `types` array: " + std::string(ex.what()))
                     .ThrowAsJavaScriptException();
                 return env.Undefined();
             }
@@ -274,7 +274,7 @@ namespace nbs {
                 types = TypeSubtype::FromJsArray(info[0].As<Napi::Array>(), env);
             }
             catch (const std::exception& ex) {
-                Napi::TypeError::New(env, std::string("invalid type for argument `types`: ") + ex.what())
+                Napi::TypeError::New(env, std::string("invalid item type in `types` array: ") + ex.what())
                     .ThrowAsJavaScriptException();
                 return env.Undefined();
             }
