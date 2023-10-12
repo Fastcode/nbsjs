@@ -18,7 +18,7 @@ namespace nbs {
         /// Convert the given JS object with `type` and `subtype` properties to a TypeSubtype struct
         static TypeSubtype FromJsValue(const Napi::Value& jsValue, const Napi::Env& env);
 
-        /// Convert a possible JS array containing objects with `type` and `subtype properties to 
+        /// Convert a possible JS array containing objects with `type` and `subtype properties to
         /// a vector of TypeSubtype structs
         static std::vector<TypeSubtype> FromJsArray(const Napi::Array& jsArray, const Napi::Env& env);
     };

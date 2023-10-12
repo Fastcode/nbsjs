@@ -26,7 +26,7 @@ namespace nbs {
                 InstanceMethod<&Decoder::GetPackets>("getPackets",
                                                      napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::GetAllPackets>("getAllPackets",
-                                                     napi_property_attributes(napi_writable | napi_configurable)),
+                                                        napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::NextTimestamp>("nextTimestamp",
                                                         napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
@@ -278,7 +278,7 @@ namespace nbs {
                     .ThrowAsJavaScriptException();
                 return env.Undefined();
             }
-        } 
+        }
         else if (info[0].IsUndefined()) {
             types = this->index.getTypes();
         }

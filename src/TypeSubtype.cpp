@@ -47,4 +47,4 @@ namespace nbs {
 
         return types;
     }
-}
+}  // namespace nbs
