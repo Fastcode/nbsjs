@@ -511,18 +511,18 @@ test('NbsDecoder.getAllPackets() returns all the packets for a single type', () 
 
 test('NbsDecoder.getAllPackets() returns all the packets for a multiple types', () => {
   const types = [
-    { type: pongType, subtype: 0 }, 
-    { type: pingType, subtype: 0 }
-  ]
+    { type: pongType, subtype: 0 },
+    { type: pingType, subtype: 0 },
+  ];
   const packets = decoder.getAllPackets(types);
   assert.equal(packets.length, 600);
 });
 
 test('NbsDecoder.getAllPackets() returns all the packets for a type with multiple subtypes', () => {
   const types = [
-    { type: pangType, subtype: 100 }, 
-    { type: pangType, subtype: 200 }
-  ]
+    { type: pangType, subtype: 100 },
+    { type: pangType, subtype: 200 },
+  ];
   const packets = decoder.getAllPackets(types);
   assert.equal(packets.length, 300);
 });
@@ -530,7 +530,7 @@ test('NbsDecoder.getAllPackets() returns all the packets for a type with multipl
 test('NbsDecoder.getAllPackets() returns empty array when given an empty array of types', () => {
   const packets = decoder.getAllPackets([]);
   assert.equal(packets.length, 0);
-})
+});
 
 const multiTypeNextTimestampArray = [
   { type: pongType, subtype: 0 },
