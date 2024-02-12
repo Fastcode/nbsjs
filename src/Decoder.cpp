@@ -115,19 +115,21 @@ namespace nbs {
         auto type_iterators = this->index.getAllTypeIterators();
         auto indices        = Napi::Array::New(env, type_iterators.size());
 
-        uint index = 0;
+        uint64_t index = 0;
 
-        for (const auto& [typeSubtype, iterators] : type_iterators) {
+        for (const auto& typeIterator : type_iterators) {
+            auto typeSubType = typeIterator.first;
+            auto iterators   = typeIterator.second;
 
             auto typeIndices = Napi::Object::New(env);
 
             auto jsType = Napi::Object::New(env);
-            jsType.Set("type", hash::ToJsValue(typeSubtype.type, env));
-            jsType.Set("subtype", Napi::Number::New(env, typeSubtype.subtype));
+            jsType.Set("type", hash::ToJsValue(typeSubType.type, env));
+            jsType.Set("subtype", Napi::Number::New(env, typeSubType.subtype));
 
             auto timestamps = Napi::Array::New(env, std::distance(iterators.first, iterators.second));
 
-            uint timestampIndex = 0;
+            uint64_t timestampIndex = 0;
             for (auto it = iterators.first; it != iterators.second; it++) {
                 auto index                   = *it;
                 timestamps[timestampIndex++] = timestamp::ToJsValue(index.item.timestamp, env);
