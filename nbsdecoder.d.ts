@@ -82,8 +82,8 @@ export declare class NbsDecoder {
   public constructor(paths: string[]);
 
   /**
-   * The index data of this decoder. 
-   * 
+   * The index data of this decoder.
+   *
    * Contains the a list of packet timestamps for each typeSubType in the loaded nbs files.
    */
   public readonly index: TypeIndex[];
@@ -131,11 +131,11 @@ export declare class NbsDecoder {
 
   /**
    * Get the packet of the given type at the given index in the loaded nbs file.
-   * 
+   *
    * Returns either the packet at the index with the given type, or `undefined` if the given
    * index is outside the range of packets for the type. Use `.index` to check the number
    * of packets of each type.
-   * 
+   *
    * @param index The index of the requested packet
    * @param type The type of the requested packet
    */
