@@ -322,7 +322,7 @@ namespace nbs {
         if (jsIndex.IsNumber()) {
             index = jsIndex.As<Napi::Number>().Int64Value();
         } else {
-            Napi::TypeError::New(env, "expected positive number for `index`");
+            Napi::TypeError::New(env, "invalid type for argument `index`: expected integer").ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
@@ -330,7 +330,7 @@ namespace nbs {
         try {
             type = this->TypeSubtypeFromJsValue(info[1], env);
         } catch (const std::exception& ex) {
-            Napi::TypeError::New(env, "invalid type for `type`: " + std::string(ex.what()));
+            Napi::TypeError::New(env, "invalid type for argument `type`: " + std::string(ex.what())).ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
@@ -338,7 +338,7 @@ namespace nbs {
         auto packetLocation = typeIterator.first + index;
 
         // If the index is out of range return undefined
-        if (packetLocation > typeIterator.second) {
+        if (packetLocation >= typeIterator.second) {
             return env.Undefined();
         }
 

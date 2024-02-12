@@ -438,6 +438,75 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
   });
 });
 
+test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex();
+    },
+    /invalid type for argument `index`: expected integer/,
+    'NbsDecoder.getPacketByIndex throws for missing `index` argument',
+  );
+
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex(true);
+    },
+    /invalid type for argument `index`: expected integer/,
+    'NbsDecoder.getPacketByIndex throws for incorrect `index` argument type',
+  );
+
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex(0);
+    },
+    /invalid type for argument `type`: expected object/,
+    'NbsDecoder.getPacketByIndex throws for missing `type` argument',
+  )
+
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex(0, {});
+    },
+    /invalid type for argument `type`: expected object with `type` and `subtype` keys/,
+    'NbsDecoder.getPacketByIndex throws for invalid `type` argument',
+  )
+});
+
+test('NbsDecoder.getPacketByIndex() returns the correct packets in the valid range', () => {
+
+  const packet0 = decoder.getPacketByIndex(0, { type: pingType, subtype: 0});
+  const packet1 = decoder.getPacketByIndex(1, { type: pingType, subtype: 0});
+  const packetLast = decoder.getPacketByIndex(299, { type: pingType, subtype: 0});
+
+  assert.equal(packet0, {
+    timestamp: { seconds: 1000, nanos: 0 },
+    type: pingType,
+    subtype: 0,
+    payload: Buffer.from('ping.0', 'utf8'),
+  });
+
+  assert.equal(packet1, {
+    timestamp: { seconds: 1003, nanos: 0 },
+    type: pingType,
+    subtype: 0,
+    payload: Buffer.from('ping.1', 'utf8'),
+  });
+
+  assert.equal(packetLast, {
+    timestamp: { seconds: 1897, nanos: 0 },
+    type: pingType,
+    subtype: 0,
+    payload: Buffer.from('ping.699', 'utf8'),
+  });
+});
+
+test('NbsDecoder.getPacketByIndex() returns undefined for indexes greater than the valid range', () => {
+  assert.equal(decoder.getPacketByIndex(300, { type: pingType, subtype: 0}), undefined);
+  assert.equal(decoder.getPacketByIndex(300, { type: pongType, subtype: 0}), undefined);
+  assert.equal(decoder.getPacketByIndex(150, { type: pangType, subtype: 100}), undefined);
+  assert.equal(decoder.getPacketByIndex(150, { type: pangType, subtype: 200}), undefined);
+});
+
 const multiTypeNextTimestampArray = [
   { type: pongType, subtype: 0 },
   { type: pingType, subtype: 0 },
