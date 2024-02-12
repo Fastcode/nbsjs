@@ -42,7 +42,7 @@ jobs:
         run: npm install -g node-gyp
 
       - name: Install dependencies
-        run: yarn ci
+        run: yarn
 
       - name: Build
         run: yarn build
