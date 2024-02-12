@@ -26,7 +26,7 @@ namespace nbs {
                 InstanceMethod<&Decoder::GetPackets>("getPackets",
                                                      napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::GetPacketByIndex>("getPacketByIndex",
-                                                     napi_property_attributes(napi_writable | napi_configurable)),
+                                                           napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::NextTimestamp>("nextTimestamp",
                                                         napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
@@ -113,7 +113,7 @@ namespace nbs {
         Napi::Env env = info.Env();
 
         auto type_iterators = this->index.getAllTypeIterators();
-        auto indices = Napi::Array::New(env, type_iterators.size());
+        auto indices        = Napi::Array::New(env, type_iterators.size());
 
         uint index = 0;
 
@@ -129,7 +129,7 @@ namespace nbs {
 
             uint timestampIndex = 0;
             for (auto it = iterators.first; it != iterators.second; it++) {
-                auto index = *it;
+                auto index                   = *it;
                 timestamps[timestampIndex++] = timestamp::ToJsValue(index.item.timestamp, env);
             }
 
@@ -318,23 +318,27 @@ namespace nbs {
         Napi::Env env = info.Env();
 
         uint64_t index = 0;
-        auto jsIndex = info[0];
+        auto jsIndex   = info[0];
         if (jsIndex.IsNumber()) {
             index = jsIndex.As<Napi::Number>().Int64Value();
-        } else {
-            Napi::TypeError::New(env, "invalid type for argument `index`: expected integer").ThrowAsJavaScriptException();
+        }
+        else {
+            Napi::TypeError::New(env, "invalid type for argument `index`: expected integer")
+                .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
         TypeSubtype type;
         try {
             type = this->TypeSubtypeFromJsValue(info[1], env);
-        } catch (const std::exception& ex) {
-            Napi::TypeError::New(env, "invalid type for argument `type`: " + std::string(ex.what())).ThrowAsJavaScriptException();
+        }
+        catch (const std::exception& ex) {
+            Napi::TypeError::New(env, "invalid type for argument `type`: " + std::string(ex.what()))
+                .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
-        auto typeIterator = this->index.getIteratorForType(type);
+        auto typeIterator   = this->index.getIteratorForType(type);
         auto packetLocation = typeIterator.first + index;
 
         // If the index is out of range return undefined
