@@ -62,6 +62,14 @@ export interface NbsTypeSubtypeBuffer extends NbsTypeSubtype {
 }
 
 /**
+ * The valid timestamps for a type subtype
+ */
+export interface TypeIndex {
+  typeSubType: NbsTypeSubtype;
+  timestamps: NbsTimestamp[];
+}
+
+/**
  * A decoder that can be used to read packets from NBS files
  */
 export declare class NbsDecoder {
@@ -72,6 +80,13 @@ export declare class NbsDecoder {
    * @throws For an empty list of paths, and for paths that don't exist
    */
   public constructor(paths: string[]);
+
+  /**
+   * The index data of this decoder. 
+   * 
+   * Contains the a list of packet timestamps for each typeSubType in the loaded nbs files.
+   */
+  public readonly index: TypeIndex[];
 
   /** Get a list of all the types present in the loaded nbs files */
   public getAvailableTypes(): NbsTypeSubtypeBuffer[];
@@ -113,6 +128,18 @@ export declare class NbsDecoder {
     timestamp: number | BigInt | NbsTimestamp,
     types: NbsTypeSubtype[]
   ): NbsPacket[];
+
+  /**
+   * Get the packet of the given type at the given index in the loaded nbs file.
+   * 
+   * Returns either the packet at the index with the given type, or `undefined` if the given
+   * index is outside the range of packets for the type. Use `.index` to check the number
+   * of packets of each type.
+   * 
+   * @param index The index of the requested packet
+   * @param type The type of the requested packet
+   */
+  public getPacketByIndex(index: number, type: NbsTypeSubtype): NbsPacket | undefined;
 
   /**
    * Get the timestamp to seek to such that all messages of the given types are stepped by (n) steps

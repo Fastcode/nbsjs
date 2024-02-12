@@ -11,6 +11,8 @@
 #include "zstr/zstr.hpp"
 namespace nbs {
 
+    using IndexIterator = std::vector<IndexItemFile>::iterator;
+
     class Index {
     public:
         /// Empty default constructor
@@ -76,6 +78,17 @@ namespace nbs {
                         return a.item.type != b.item.type ? a.item.type < b.item.type : a.item.subtype < b.item.subtype;
                     });
             }
+        }
+
+        /// Get all iterators for all type subtype pairs in the index
+        std::vector<std::pair<TypeSubtype, std::pair<IndexIterator, IndexIterator>>> getAllTypeIterators() {
+            std::vector<std::pair<TypeSubtype, std::pair<IndexIterator, IndexIterator>>> result;
+
+            for (const auto& pair : this->typeMap) {
+                result.push_back(pair);
+            }
+
+            return result;
         }
 
         /// Get the iterator range (begin, end) for the given type and subtype in the index

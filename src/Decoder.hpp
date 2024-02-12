@@ -18,6 +18,9 @@ namespace nbs {
         /// Constructor: takes a list of file paths from JS and constructs a Decoder
         Decoder(const Napi::CallbackInfo& info);
 
+        /// Create the object representing the index file
+        Napi::Value GetIndices(const Napi::CallbackInfo& info);
+
         /// Get a list of the available types in the nbs files of this decoder
         /// Returns a JS array of type subtype objects
         Napi::Value GetAvailableTypes(const Napi::CallbackInfo& info);
@@ -29,6 +32,9 @@ namespace nbs {
         /// Get a list of packets at the given timestamp matching the given list of types and subtypes
         /// Returns a JS array of packet objects
         Napi::Value GetPackets(const Napi::CallbackInfo& info);
+
+        /// Get the packet at the given index of the given type subtype
+        Napi::Value GetPacketByIndex(const Napi::CallbackInfo& info);
 
         Napi::Value NextTimestamp(const Napi::CallbackInfo& info);
 

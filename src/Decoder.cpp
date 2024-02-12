@@ -25,9 +25,12 @@ namespace nbs {
                     napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::GetPackets>("getPackets",
                                                      napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::GetPacketByIndex>("getPacketByIndex",
+                                                     napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::NextTimestamp>("nextTimestamp",
                                                         napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceAccessor<&Decoder::GetIndices>("index"),
             });
 
         Napi::FunctionReference* constructor = new Napi::FunctionReference();
@@ -104,6 +107,39 @@ namespace nbs {
         for (auto& path : paths) {
             this->memoryMaps.emplace_back(path, 0, mio::map_entire_file);
         }
+    }
+
+    Napi::Value Decoder::GetIndices(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env();
+
+        auto type_iterators = this->index.getAllTypeIterators();
+        auto indices = Napi::Array::New(env, type_iterators.size());
+
+        uint index = 0;
+
+        for (const auto& [typeSubtype, iterators] : type_iterators) {
+
+            auto typeIndices = Napi::Object::New(env);
+
+            auto jsType = Napi::Object::New(env);
+            jsType.Set("type", hash::ToJsValue(typeSubtype.type, env));
+            jsType.Set("subtype", Napi::Number::New(env, typeSubtype.subtype));
+
+            auto timestamps = Napi::Array::New(env, std::distance(iterators.first, iterators.second));
+
+            uint timestampIndex = 0;
+            for (auto it = iterators.first; it != iterators.second; it++) {
+                auto index = *it;
+                timestamps[timestampIndex++] = timestamp::ToJsValue(index.item.timestamp, env);
+            }
+
+            typeIndices.Set("typeSubType", jsType);
+            typeIndices.Set("timestamps", timestamps);
+
+            indices[index++] = typeIndices;
+        }
+
+        return indices;
     }
 
     Napi::Value Decoder::GetAvailableTypes(const Napi::CallbackInfo& info) {
@@ -276,6 +312,38 @@ namespace nbs {
         }
 
         return jsPackets;
+    }
+
+    Napi::Value Decoder::GetPacketByIndex(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env();
+
+        uint64_t index = 0;
+        auto jsIndex = info[0];
+        if (jsIndex.IsNumber()) {
+            index = jsIndex.As<Napi::Number>().Int64Value();
+        } else {
+            Napi::TypeError::New(env, "expected positive number for `index`");
+            return env.Undefined();
+        }
+
+        TypeSubtype type;
+        try {
+            type = this->TypeSubtypeFromJsValue(info[1], env);
+        } catch (const std::exception& ex) {
+            Napi::TypeError::New(env, "invalid type for `type`: " + std::string(ex.what()));
+            return env.Undefined();
+        }
+
+        auto typeIterator = this->index.getIteratorForType(type);
+        auto packetLocation = typeIterator.first + index;
+
+        // If the index is out of range return undefined
+        if (packetLocation > typeIterator.second) {
+            return env.Undefined();
+        }
+
+        auto packet = this->Read(*packetLocation);
+        return Packet::ToJsValue(packet, env);
     }
 
     std::vector<Packet> Decoder::GetMatchingPackets(const uint64_t& timestamp, const std::vector<TypeSubtype>& types) {
