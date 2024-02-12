@@ -5,7 +5,7 @@
   "main": "nbsdecoder.js",
   "types": "nbsdecoder.d.ts",
   "engines": {
-    "node": ">=14.14.0"
+    "node": ">=18.17.0"
   },
   "files": [
     "nbsdecoder.js",
