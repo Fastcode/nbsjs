@@ -8,19 +8,32 @@ jobs:
   publish_to_npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
         with:
           ref: main
 
       # Installs Node and sets up up the .npmrc file to publish to npm
-      - uses: actions/setup-node@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - run: yarn install
-      - run: yarn test
-      - run: node .github/auto-publish-action.js
+      - name: Install node-gyp
+        run: npm install -g node-gyp@10.0.1
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build
+        run: yarn build
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Publish to npm
+        run: node .github/auto-publish-action.js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
