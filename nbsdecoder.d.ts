@@ -82,11 +82,11 @@ export declare class NbsDecoder {
   public constructor(paths: string[]);
 
   /**
-   * The index data of this decoder.
+   * Get all the timestamps of a specified message type subtype.
    *
-   * Contains the a list of packet timestamps for each typeSubType in the loaded nbs files.
+   * @param type A type subtype object to get the timestamps for
    */
-  public readonly index: TypeIndex[];
+  public getTypeIndex(type: NbsTypeSubtype): NbsTimestamp[];
 
   /** Get a list of all the types present in the loaded nbs files */
   public getAvailableTypes(): NbsTypeSubtypeBuffer[];

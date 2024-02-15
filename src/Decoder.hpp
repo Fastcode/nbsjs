@@ -18,12 +18,12 @@ namespace nbs {
         /// Constructor: takes a list of file paths from JS and constructs a Decoder
         Decoder(const Napi::CallbackInfo& info);
 
-        /// Create the object representing the index file
-        Napi::Value GetIndices(const Napi::CallbackInfo& info);
-
         /// Get a list of the available types in the nbs files of this decoder
         /// Returns a JS array of type subtype objects
         Napi::Value GetAvailableTypes(const Napi::CallbackInfo& info);
+
+        /// Get the timestamps for a specified type subtype
+        Napi::Value GetTypeIndex(const Napi::CallbackInfo& info);
 
         /// Get a list of the available types in the nbs files of this decoder
         /// Returns a JS array with two elements: the start timestamp object and the end timestamp object

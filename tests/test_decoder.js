@@ -79,32 +79,33 @@ test('NbsDecoder constructor throws for invalid arguments', () => {
   );
 });
 
-test('NbsDecoder.index contains the correct number of timestamps', () => {
-  const pingIndices = decoder.index.find((index) => pingType.equals(index.typeSubType.type));
-  assert.equal(pingIndices.timestamps.length, 300);
+test('NbsDecoder.getTypeIndex returns the correct number of timestamps', () => {
+  const pingIndices = decoder.getTypeIndex({ type: pingType, subtype: 0 });
+  assert.equal(pingIndices.length, 300);
 
-  const pongIndices = decoder.index.find((index) => pongType.equals(index.typeSubType.type));
-  assert.equal(pongIndices.timestamps.length, 300);
+  const pongIndices = decoder.getTypeIndex({ type: pongType, subtype: 0 });
+  assert.equal(pongIndices.length, 300);
 
-  const pang100Indices = decoder.index.find(
-    (index) => pangType.equals(index.typeSubType.type) && index.typeSubType.subtype === 100
-  );
-  assert.equal(pang100Indices.timestamps.length, 150);
+  const pang100Indices = decoder.getTypeIndex({ type: pangType, subtype: 100 });
+  assert.equal(pang100Indices.length, 150);
 
-  const pang200Indices = decoder.index.find(
-    (index) => pangType.equals(index.typeSubType.type) && index.typeSubType.subtype === 200
-  );
-  assert.equal(pang200Indices.timestamps.length, 150);
+  const pang200Indices = decoder.getTypeIndex({ type: pangType, subtype: 200 });
+  assert.equal(pang200Indices.length, 150);
 });
 
-test('NbsDecoder.index contains the correct packet timestamps', () => {
-  const pingIndices = decoder.index.find((index) => pingType.equals(index.typeSubType.type));
+test('NbsDecoder.getTypeIndex returns an empty array for types not in the decoder', () => {
+  const fakePacketIndices = decoder.getTypeIndex({ type: 'fakeIndex', subtype: 0 });
+  assert.equal(fakePacketIndices.length, 0);
+});
 
-  assert.equal(pingIndices.timestamps[0], { seconds: 1000, nanos: 0 });
-  assert.equal(pingIndices.timestamps[1], { seconds: 1003, nanos: 0 });
+test('NbsDecoder.getTypeIndex the correct packet timestamps', () => {
+  const pingIndices = decoder.getTypeIndex({ type: pingType, subtype: 0 });
 
-  const lastIndex = pingIndices.timestamps.length - 1;
-  assert.equal(pingIndices.timestamps[lastIndex], { seconds: 1897, nanos: 0 });
+  assert.equal(pingIndices[0], { seconds: 1000, nanos: 0 });
+  assert.equal(pingIndices[1], { seconds: 1003, nanos: 0 });
+
+  const lastIndex = pingIndices.length - 1;
+  assert.equal(pingIndices[lastIndex], { seconds: 1897, nanos: 0 });
 });
 
 test('NbsDecoder.getAvailableTypes() returns a list of all the types available in the nbs files', () => {

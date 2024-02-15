@@ -23,6 +23,8 @@ namespace nbs {
                 InstanceMethod<&Decoder::GetTimestampRange>(
                     "getTimestampRange",
                     napi_property_attributes(napi_writable | napi_configurable)),
+                InstanceMethod<&Decoder::GetTypeIndex>("getTypeIndex",
+                                                       napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::GetPackets>("getPackets",
                                                      napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::GetPacketByIndex>("getPacketByIndex",
@@ -30,7 +32,6 @@ namespace nbs {
                 InstanceMethod<&Decoder::NextTimestamp>("nextTimestamp",
                                                         napi_property_attributes(napi_writable | napi_configurable)),
                 InstanceMethod<&Decoder::Close>("close", napi_property_attributes(napi_writable | napi_configurable)),
-                InstanceAccessor<&Decoder::GetIndices>("index"),
             });
 
         Napi::FunctionReference* constructor = new Napi::FunctionReference();
@@ -109,39 +110,28 @@ namespace nbs {
         }
     }
 
-    Napi::Value Decoder::GetIndices(const Napi::CallbackInfo& info) {
+    Napi::Value Decoder::GetTypeIndex(const Napi::CallbackInfo& info) {
         Napi::Env env = info.Env();
 
-        auto type_iterators = this->index.getAllTypeIterators();
-        auto indices        = Napi::Array::New(env, type_iterators.size());
-
-        uint64_t index = 0;
-
-        for (const auto& typeIterator : type_iterators) {
-            auto typeSubType = typeIterator.first;
-            auto iterators   = typeIterator.second;
-
-            auto typeIndices = Napi::Object::New(env);
-
-            auto jsType = Napi::Object::New(env);
-            jsType.Set("type", hash::ToJsValue(typeSubType.type, env));
-            jsType.Set("subtype", Napi::Number::New(env, typeSubType.subtype));
-
-            auto timestamps = Napi::Array::New(env, std::distance(iterators.first, iterators.second));
-
-            uint64_t timestampIndex = 0;
-            for (auto it = iterators.first; it != iterators.second; it++) {
-                auto index                   = *it;
-                timestamps[timestampIndex++] = timestamp::ToJsValue(index.item.timestamp, env);
-            }
-
-            typeIndices.Set("typeSubType", jsType);
-            typeIndices.Set("timestamps", timestamps);
-
-            indices[index++] = typeIndices;
+        TypeSubtype type;
+        try {
+            type = this->TypeSubtypeFromJsValue(info[0], env);
+        }
+        catch (const std::exception& ex) {
+            Napi::TypeError::New(env, "invalid type for argument `type`: " + std::string(ex.what()))
+                .ThrowAsJavaScriptException();
+            return env.Undefined();
         }
 
-        return indices;
+        auto typeIterator = this->index.getIteratorForType(type);
+        auto timestamps   = Napi::Array::New(env, std::distance(typeIterator.first, typeIterator.second));
+
+        uint64_t idx = 0;
+        for (auto it = typeIterator.first; it != typeIterator.second; it++) {
+            timestamps[idx++] = timestamp::ToJsValue(it->item.timestamp, env);
+        }
+
+        return timestamps;
     }
 
     Napi::Value Decoder::GetAvailableTypes(const Napi::CallbackInfo& info) {
@@ -343,7 +333,7 @@ namespace nbs {
         auto typeIterator = this->index.getIteratorForType(type);
 
         // If the index is out of range return undefined
-        if (std::distance(typeIterator.first, typeIterator.second) < index) {
+        if (std::distance(typeIterator.first, typeIterator.second) <= index) {
             return env.Undefined();
         }
 
