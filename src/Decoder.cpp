@@ -340,15 +340,15 @@ namespace nbs {
             return env.Undefined();
         }
 
-        auto typeIterator   = this->index.getIteratorForType(type);
-        auto packetLocation = typeIterator.first + index;
+        auto typeIterator = this->index.getIteratorForType(type);
 
         // If the index is out of range return undefined
-        if (packetLocation >= typeIterator.second) {
+        if (std::distance(typeIterator.first, typeIterator.second) < index) {
             return env.Undefined();
         }
 
-        auto packet = this->Read(*packetLocation);
+        auto packetLocation = std::next(typeIterator.first, index);
+        auto packet         = this->Read(*packetLocation);
         return Packet::ToJsValue(packet, env);
     }
 
