@@ -85,10 +85,11 @@ namespace nbs {
         std::pair<nbs::IndexIterator, nbs::IndexIterator> getIteratorForType(const TypeSubtype& type) {
             // Check that the type actually exists, otherwise the type map will add the given type
             // with an empty iterator
-            auto typeExists = (this->typeMap.count(type) > 0);
-            if (typeExists) {
+            auto typeExists = (this->typeMap.find(type) != this->typeMap.end());
+            if (typeExists == true) {
                 return this->typeMap[type];
             }
+            return std::make_pair((std::vector<IndexItemFile>::iterator) 0, (std::vector<IndexItemFile>::iterator) 0);
         }
 
         /// Get a list of iterator ranges (begin, end) for the given list of type and subtype in the index
