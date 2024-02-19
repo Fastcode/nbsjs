@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <map>
-#include <optional>
 #include <sys/stat.h>
 #include <vector>
 
