@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <optional>
 #include <sys/stat.h>
 #include <vector>
 
@@ -80,23 +81,14 @@ namespace nbs {
             }
         }
 
-        /// Get all iterators for all type subtype pairs in the index
-        std::vector<std::pair<TypeSubtype, std::pair<IndexIterator, IndexIterator>>> getAllTypeIterators() {
-            std::vector<std::pair<TypeSubtype, std::pair<IndexIterator, IndexIterator>>> result;
-
-            for (const auto& pair : this->typeMap) {
-                result.push_back(pair);
-            }
-
-            return result;
-        }
-
         /// Get the iterator range (begin, end) for the given type and subtype in the index
         std::pair<nbs::IndexIterator, nbs::IndexIterator> getIteratorForType(const TypeSubtype& type) {
             // Check that the type actually exists, otherwise the type map will add the given type
             // with an empty iterator
             auto typeExists = (this->typeMap.count(type) > 0);
-            return typeExists ? this->typeMap[type] : std::make_pair((nbs::IndexIterator) 0, (nbs::IndexIterator) 0);
+            if (typeExists) {
+                return this->typeMap[type];
+            }
         }
 
         /// Get a list of iterator ranges (begin, end) for the given list of type and subtype in the index

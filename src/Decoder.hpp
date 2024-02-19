@@ -22,7 +22,7 @@ namespace nbs {
         /// Returns a JS array of type subtype objects
         Napi::Value GetAvailableTypes(const Napi::CallbackInfo& info);
 
-        /// Get the timestamps for a specified type subtype
+        /// Get all the timestamps of a specified message type subtype from the index
         Napi::Value GetTypeIndex(const Napi::CallbackInfo& info);
 
         /// Get a list of the available types in the nbs files of this decoder

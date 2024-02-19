@@ -79,7 +79,7 @@ test('NbsDecoder constructor throws for invalid arguments', () => {
   );
 });
 
-test('NbsDecoder.getTypeIndex returns the correct number of timestamps', () => {
+test('NbsDecoder.getTypeIndex() returns the correct index for the given type subtype', () => {
   const pingIndices = decoder.getTypeIndex({ type: pingType, subtype: 0 });
   assert.equal(pingIndices.length, 300);
 
@@ -93,12 +93,12 @@ test('NbsDecoder.getTypeIndex returns the correct number of timestamps', () => {
   assert.equal(pang200Indices.length, 150);
 });
 
-test('NbsDecoder.getTypeIndex returns an empty array for types not in the decoder', () => {
+test('NbsDecoder.getTypeIndex() returns an empty array for types not in the decoder', () => {
   const fakePacketIndices = decoder.getTypeIndex({ type: 'fakeIndex', subtype: 0 });
   assert.equal(fakePacketIndices.length, 0);
 });
 
-test('NbsDecoder.getTypeIndex the correct packet timestamps', () => {
+test('NbsDecoder.getTypeIndex() returns the correct index with the correct packet timestamps', () => {
   const pingIndices = decoder.getTypeIndex({ type: pingType, subtype: 0 });
 
   assert.equal(pingIndices[0], { seconds: 1000, nanos: 0 });
@@ -473,7 +473,7 @@ test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
       decoder.getPacketByIndex();
     },
     /invalid type for argument `index`: expected integer/,
-    'NbsDecoder.getPacketByIndex throws for missing `index` argument'
+    'NbsDecoder.getPacketByIndex() throws for missing `index` argument'
   );
 
   assert.throws(
@@ -481,7 +481,7 @@ test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
       decoder.getPacketByIndex(true);
     },
     /invalid type for argument `index`: expected integer/,
-    'NbsDecoder.getPacketByIndex throws for incorrect `index` argument type'
+    'NbsDecoder.getPacketByIndex() throws for incorrect `index` argument type'
   );
 
   assert.throws(
@@ -489,7 +489,7 @@ test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
       decoder.getPacketByIndex(0);
     },
     /invalid type for argument `type`: expected object/,
-    'NbsDecoder.getPacketByIndex throws for missing `type` argument'
+    'NbsDecoder.getPacketByIndex() throws for missing `type` argument'
   );
 
   assert.throws(
@@ -497,11 +497,11 @@ test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
       decoder.getPacketByIndex(0, {});
     },
     /invalid type for argument `type`: expected object with `type` and `subtype` keys/,
-    'NbsDecoder.getPacketByIndex throws for invalid `type` argument'
+    'NbsDecoder.getPacketByIndex() throws for invalid `type` argument'
   );
 });
 
-test('NbsDecoder.getPacketByIndex() returns the correct packets in the valid range', () => {
+test('NbsDecoder.getPacketByIndex() returns the correct packet for a valid index', () => {
   const packet0 = decoder.getPacketByIndex(0, { type: pingType, subtype: 0 });
   const packet1 = decoder.getPacketByIndex(1, { type: pingType, subtype: 0 });
   const packetLast = decoder.getPacketByIndex(299, { type: pingType, subtype: 0 });
@@ -528,7 +528,11 @@ test('NbsDecoder.getPacketByIndex() returns the correct packets in the valid ran
   });
 });
 
-test('NbsDecoder.getPacketByIndex() returns undefined for indexes greater than the valid range', () => {
+test('NbsDecoder.getPacketByIndex() returns undefined for indices outside the valid range', () => {
+  // Negative indices
+  assert.equal(decoder.getPacketByIndex(-1, { type: pingType, subtype: 0 }), undefined);
+
+  // Indices one above the max
   assert.equal(decoder.getPacketByIndex(300, { type: pingType, subtype: 0 }), undefined);
   assert.equal(decoder.getPacketByIndex(300, { type: pongType, subtype: 0 }), undefined);
   assert.equal(decoder.getPacketByIndex(150, { type: pangType, subtype: 100 }), undefined);

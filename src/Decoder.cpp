@@ -113,17 +113,17 @@ namespace nbs {
     Napi::Value Decoder::GetTypeIndex(const Napi::CallbackInfo& info) {
         Napi::Env env = info.Env();
 
-        TypeSubtype type;
+        TypeSubtype typeSubtype;
         try {
-            type = this->TypeSubtypeFromJsValue(info[0], env);
+            typeSubtype = this->TypeSubtypeFromJsValue(info[0], env);
         }
         catch (const std::exception& ex) {
-            Napi::TypeError::New(env, "invalid type for argument `type`: " + std::string(ex.what()))
+            Napi::TypeError::New(env, "invalid type for argument `typeSubtype`: " + std::string(ex.what()))
                 .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
-        auto typeIterator = this->index.getIteratorForType(type);
+        auto typeIterator = this->index.getIteratorForType(typeSubtype);
         auto timestamps   = Napi::Array::New(env, std::distance(typeIterator.first, typeIterator.second));
 
         uint64_t idx = 0;
@@ -309,8 +309,8 @@ namespace nbs {
     Napi::Value Decoder::GetPacketByIndex(const Napi::CallbackInfo& info) {
         Napi::Env env = info.Env();
 
-        uint64_t index = 0;
-        auto jsIndex   = info[0];
+        int64_t index = 0;
+        auto jsIndex  = info[0];
         if (jsIndex.IsNumber()) {
             index = jsIndex.As<Napi::Number>().Int64Value();
         }
@@ -320,17 +320,21 @@ namespace nbs {
             return env.Undefined();
         }
 
-        TypeSubtype type;
+        if (index < 0) {
+            return env.Undefined();
+        }
+
+        TypeSubtype typeSubtype;
         try {
-            type = this->TypeSubtypeFromJsValue(info[1], env);
+            typeSubtype = this->TypeSubtypeFromJsValue(info[1], env);
         }
         catch (const std::exception& ex) {
-            Napi::TypeError::New(env, "invalid type for argument `type`: " + std::string(ex.what()))
+            Napi::TypeError::New(env, "invalid type for argument `typeSubtype`: " + std::string(ex.what()))
                 .ThrowAsJavaScriptException();
             return env.Undefined();
         }
 
-        auto typeIterator = this->index.getIteratorForType(type);
+        auto typeIterator = this->index.getIteratorForType(typeSubtype);
 
         // If the index is out of range return undefined
         if (std::distance(typeIterator.first, typeIterator.second) <= index) {
