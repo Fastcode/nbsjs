@@ -488,7 +488,7 @@ test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
     () => {
       decoder.getPacketByIndex(0);
     },
-    /invalid type for argument `type`: expected object/,
+    /invalid type for argument `typeSubtype`: expected object/,
     'NbsDecoder.getPacketByIndex() throws for missing `type` argument'
   );
 
@@ -496,7 +496,7 @@ test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
     () => {
       decoder.getPacketByIndex(0, {});
     },
-    /invalid type for argument `type`: expected object with `type` and `subtype` keys/,
+    /invalid type for argument `typeSubtype`: expected object with `type` and `subtype` keys/,
     'NbsDecoder.getPacketByIndex() throws for invalid `type` argument'
   );
 });
