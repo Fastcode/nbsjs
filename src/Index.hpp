@@ -89,7 +89,7 @@ namespace nbs {
             if (typeExists == true) {
                 return this->typeMap[type];
             }
-            return std::make_pair((std::vector<IndexItemFile>::iterator) 0, (std::vector<IndexItemFile>::iterator) 0);
+            return {};
         }
 
         /// Get a list of iterator ranges (begin, end) for the given list of type and subtype in the index
