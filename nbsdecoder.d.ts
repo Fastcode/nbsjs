@@ -61,6 +61,12 @@ export interface NbsTypeSubtypeBuffer extends NbsTypeSubtype {
   type: Buffer;
 }
 
+/** The timestamps for a type subtype */
+export interface TypeIndex {
+  typeSubType: NbsTypeSubtype;
+  timestamps: NbsTimestamp[];
+}
+
 /**
  * A decoder that can be used to read packets from NBS files
  */
@@ -73,6 +79,13 @@ export declare class NbsDecoder {
    */
   public constructor(paths: string[]);
 
+  /**
+   * Get all the timestamps of a specified message type subtype.
+   *
+   * @param typeSubtype A type subtype object to get the timestamps for
+   */
+  public getTypeIndex(typeSubtype: NbsTypeSubtype): NbsTimestamp[];
+
   /** Get a list of all the types present in the loaded nbs files */
   public getAvailableTypes(): NbsTypeSubtypeBuffer[];
 
@@ -82,9 +95,9 @@ export declare class NbsDecoder {
   /**
    * Get the timestamp range (start, end) for all packets of the given type in the loaded nbs files
    *
-   * @param type A type subtype object to get the timestamp range for
+   * @param typeSubtype A type subtype object to get the timestamp range for
    */
-  public getTimestampRange(type: NbsTypeSubtype): [NbsTimestamp, NbsTimestamp];
+  public getTimestampRange(typeSubtype: NbsTypeSubtype): [NbsTimestamp, NbsTimestamp];
 
   /**
    * Get the packets at or before the given timestamp for all types in the loaded nbs files
@@ -113,6 +126,17 @@ export declare class NbsDecoder {
     timestamp: number | BigInt | NbsTimestamp,
     types: NbsTypeSubtype[]
   ): NbsPacket[];
+
+  /**
+   * Get the packet of the given type at the given index in the loaded nbs file.
+   *
+   * Returns either the packet at the index with the given type, or `undefined` if the given
+   * index is outside the range of packets for the type.
+   *
+   * @param index       The index of the requested packet
+   * @param typeSubtype The type of the requested packet
+   */
+  public getPacketByIndex(index: number, typeSubtype: NbsTypeSubtype): NbsPacket | undefined;
 
   /**
    * Get the timestamp to seek to such that all messages of the given types are stepped by (n) steps

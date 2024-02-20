@@ -22,6 +22,9 @@ namespace nbs {
         /// Returns a JS array of type subtype objects
         Napi::Value GetAvailableTypes(const Napi::CallbackInfo& info);
 
+        /// Get all the timestamps of a specified message type subtype from the index
+        Napi::Value GetTypeIndex(const Napi::CallbackInfo& info);
+
         /// Get a list of the available types in the nbs files of this decoder
         /// Returns a JS array with two elements: the start timestamp object and the end timestamp object
         Napi::Value GetTimestampRange(const Napi::CallbackInfo& info);
@@ -29,6 +32,9 @@ namespace nbs {
         /// Get a list of packets at the given timestamp matching the given list of types and subtypes
         /// Returns a JS array of packet objects
         Napi::Value GetPackets(const Napi::CallbackInfo& info);
+
+        /// Get the packet at the given index of the given type subtype
+        Napi::Value GetPacketByIndex(const Napi::CallbackInfo& info);
 
         Napi::Value NextTimestamp(const Napi::CallbackInfo& info);
 
