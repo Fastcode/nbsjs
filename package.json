@@ -1,6 +1,6 @@
 {
   "name": "nbsdecoder.js",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Node.js module for interacting with NUClear Binary Stream files",
   "main": "nbsdecoder.js",
   "types": "nbsdecoder.d.ts",
