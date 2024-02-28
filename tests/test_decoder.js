@@ -79,6 +79,35 @@ test('NbsDecoder constructor throws for invalid arguments', () => {
   );
 });
 
+test('NbsDecoder.getTypeIndex() returns the correct index for the given type subtype', () => {
+  const pingIndices = decoder.getTypeIndex({ type: pingType, subtype: 0 });
+  assert.equal(pingIndices.length, 300);
+
+  const pongIndices = decoder.getTypeIndex({ type: pongType, subtype: 0 });
+  assert.equal(pongIndices.length, 300);
+
+  const pang100Indices = decoder.getTypeIndex({ type: pangType, subtype: 100 });
+  assert.equal(pang100Indices.length, 150);
+
+  const pang200Indices = decoder.getTypeIndex({ type: pangType, subtype: 200 });
+  assert.equal(pang200Indices.length, 150);
+});
+
+test('NbsDecoder.getTypeIndex() returns an empty array for types not in the decoder', () => {
+  const fakePacketIndices = decoder.getTypeIndex({ type: 'fakeIndex', subtype: 0 });
+  assert.equal(fakePacketIndices.length, 0);
+});
+
+test('NbsDecoder.getTypeIndex() returns the correct index with the correct packet timestamps', () => {
+  const pingIndices = decoder.getTypeIndex({ type: pingType, subtype: 0 });
+
+  assert.equal(pingIndices[0], { seconds: 1000, nanos: 0 });
+  assert.equal(pingIndices[1], { seconds: 1003, nanos: 0 });
+
+  const lastIndex = pingIndices.length - 1;
+  assert.equal(pingIndices[lastIndex], { seconds: 1897, nanos: 0 });
+});
+
 test('NbsDecoder.getAvailableTypes() returns a list of all the types available in the nbs files', () => {
   const types = decoder.getAvailableTypes();
 
@@ -436,6 +465,78 @@ test('NbsDecoder.getPackets() returns the last packet of each type when given a 
     subtype: 0,
     payload: Buffer.from('pong.699', 'utf8'),
   });
+});
+
+test('NbsDecoder.getPacketByIndex() throws for invalid arguments', () => {
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex();
+    },
+    /invalid type for argument `index`: expected integer/,
+    'NbsDecoder.getPacketByIndex() throws for missing `index` argument'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex(true);
+    },
+    /invalid type for argument `index`: expected integer/,
+    'NbsDecoder.getPacketByIndex() throws for incorrect `index` argument type'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex(0);
+    },
+    /invalid type for argument `typeSubtype`: expected object/,
+    'NbsDecoder.getPacketByIndex() throws for missing `type` argument'
+  );
+
+  assert.throws(
+    () => {
+      decoder.getPacketByIndex(0, {});
+    },
+    /invalid type for argument `typeSubtype`: expected object with `type` and `subtype` keys/,
+    'NbsDecoder.getPacketByIndex() throws for invalid `type` argument'
+  );
+});
+
+test('NbsDecoder.getPacketByIndex() returns the correct packet for a valid index', () => {
+  const packet0 = decoder.getPacketByIndex(0, { type: pingType, subtype: 0 });
+  const packet1 = decoder.getPacketByIndex(1, { type: pingType, subtype: 0 });
+  const packetLast = decoder.getPacketByIndex(299, { type: pingType, subtype: 0 });
+
+  assert.equal(packet0, {
+    timestamp: { seconds: 1000, nanos: 0 },
+    type: pingType,
+    subtype: 0,
+    payload: Buffer.from('ping.0', 'utf8'),
+  });
+
+  assert.equal(packet1, {
+    timestamp: { seconds: 1003, nanos: 0 },
+    type: pingType,
+    subtype: 0,
+    payload: Buffer.from('ping.1', 'utf8'),
+  });
+
+  assert.equal(packetLast, {
+    timestamp: { seconds: 1897, nanos: 0 },
+    type: pingType,
+    subtype: 0,
+    payload: Buffer.from('ping.699', 'utf8'),
+  });
+});
+
+test('NbsDecoder.getPacketByIndex() returns undefined for indices outside the valid range', () => {
+  // Negative indices
+  assert.equal(decoder.getPacketByIndex(-1, { type: pingType, subtype: 0 }), undefined);
+
+  // Indices one above the max
+  assert.equal(decoder.getPacketByIndex(300, { type: pingType, subtype: 0 }), undefined);
+  assert.equal(decoder.getPacketByIndex(300, { type: pongType, subtype: 0 }), undefined);
+  assert.equal(decoder.getPacketByIndex(150, { type: pangType, subtype: 100 }), undefined);
+  assert.equal(decoder.getPacketByIndex(150, { type: pangType, subtype: 200 }), undefined);
 });
 
 const multiTypeNextTimestampArray = [
