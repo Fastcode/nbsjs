@@ -30,7 +30,7 @@ namespace nbs {
                 uint64_t seconds = ts.Get("seconds").As<Napi::Number>().Int64Value();
                 uint64_t nanos   = ts.Get("nanos").As<Napi::Number>().Int64Value();
 
-                timestamp = seconds * 1e9 + nanos;
+                timestamp = seconds * 1000000000L + nanos;
             }
             else {
                 throw std::runtime_error("expected positive number or BigInt or timestamp object");
