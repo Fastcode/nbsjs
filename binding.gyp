@@ -63,6 +63,12 @@
                     'OS=="win"',
                     {
                         "defines": ["_HAS_EXCEPTIONS=1", "NOMINMAX=1"],
+                        "libraries": [
+                            "-l<(module_root_dir)/src/zlib/lib/zlib_a.lib",
+                        ],
+                        "include_dirs": [
+                            "-l<(module_root_dir)/src/zlib/include",
+                        ],
                         "msvs_settings": {
                             "VCCLCompilerTool": {
                                 "AdditionalOptions": ["-std:c++14"],
