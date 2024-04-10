@@ -3,7 +3,8 @@
         {
             "target_name": "zlib",
             "type": "static_library",
-            "cflags": ["-Wno-error"],
+            "cflags_cc!": ["-Werror"],
+            "cflags_cc": ["-Wno-error"],
             "sources": [
                 "src/third-party/zlib/adler32.c",
                 "src/third-party/zlib/compress.c",
