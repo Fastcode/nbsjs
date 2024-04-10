@@ -3,6 +3,8 @@
         {
             "target_name": "zlib",
             "type": "static_library",
+            "cflags!": ["-Werror"],
+            "cflags": ["-Wno-error"],
             "cflags_cc!": ["-Werror"],
             "cflags_cc": ["-Wno-error"],
             "sources": [
