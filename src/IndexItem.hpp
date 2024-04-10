@@ -5,7 +5,7 @@
 #include <fstream>
 #include <vector>
 
-#include "mio/mmap.hpp"
+#include "third-party/mio/mmap.hpp"
 
 namespace nbs {
     // Make the packing match what it would be in the file.

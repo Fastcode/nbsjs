@@ -35,10 +35,10 @@
 // can be removed.
 #if __cplusplus == 201103L
 
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
+    #include <cstddef>
+    #include <memory>
+    #include <type_traits>
+    #include <utility>
 
 // It's a bit naughty to add things to std::, but the point is to
 // "polyfill" this function in only if std:: doesn't have it
@@ -47,40 +47,38 @@
 // in N3656: https://isocpp.org/files/papers/N3656.txt
 // This is more or less exactly how it is implemented in GCC (e.g. 6.3.1)
 // when C++14 is enabled.
-namespace std
-{
-    template<class T> struct _Unique_if {
+namespace std {
+    template <class T>
+    struct _Unique_if {
         typedef unique_ptr<T> _Single_object;
     };
 
-    template<class T> struct _Unique_if<T[]> {
+    template <class T>
+    struct _Unique_if<T[]> {
         typedef unique_ptr<T[]> _Unknown_bound;
     };
 
-    template<class T, size_t N> struct _Unique_if<T[N]> {
+    template <class T, size_t N>
+    struct _Unique_if<T[N]> {
         typedef void _Known_bound;
     };
 
     /// std::make_unique for single objects
-    template<class T, class... Args>
-        typename _Unique_if<T>::_Single_object
-        make_unique(Args&&... args) {
-            return unique_ptr<T>(new T(std::forward<Args>(args)...));
-        }
+    template <class T, class... Args>
+    typename _Unique_if<T>::_Single_object make_unique(Args&&... args) {
+        return unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
 
     /// std::make_unique for arrays of unknown bound
-    template<class T>
-        typename _Unique_if<T>::_Unknown_bound
-        make_unique(size_t n) {
-            typedef typename remove_extent<T>::type U;
-            return unique_ptr<T>(new U[n]());
-        }
+    template <class T>
+    typename _Unique_if<T>::_Unknown_bound make_unique(size_t n) {
+        typedef typename remove_extent<T>::type U;
+        return unique_ptr<T>(new U[n]());
+    }
 
     /// Disable std::make_unique for arrays of known bound
-    template<class T, class... Args>
-        typename _Unique_if<T>::_Known_bound
-        make_unique(Args&&...) = delete;
-}
+    template <class T, class... Args>
+    typename _Unique_if<T>::_Known_bound make_unique(Args&&...) = delete;
+}  // namespace std
 
-#endif // __cplusplus == 201103L
-
+#endif  // __cplusplus == 201103L

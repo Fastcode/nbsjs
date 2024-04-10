@@ -8,7 +8,8 @@
 
 #include "IndexItem.hpp"
 #include "TypeSubtype.hpp"
-#include "zstr/zstr.hpp"
+#include "third-party/zstr/zstr.hpp"
+
 namespace nbs {
 
     using IndexIterator = std::vector<IndexItemFile>::iterator;
