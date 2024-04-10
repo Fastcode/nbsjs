@@ -2,5 +2,3 @@ The files in this folder were downloaded from the latest release of zlib from ht
 
 - cleaned up by removing all sub folders and all files that are not `.c` or `.h` in the root, except LICENSE
 - added this README
-- added `.clang-format` to skip formatting, since that introduced syntax errors
-

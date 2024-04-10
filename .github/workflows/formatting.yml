@@ -33,6 +33,6 @@ jobs:
         uses: DoozyX/clang-format-lint-action@v0.13
         with:
           source: './src'
-          exclude: './src/mio ./src/xxhash ./src/zstr'
+          exclude: './src/third-party'
           extensions: 'h,c,cpp,hpp'
           clangFormatVersion: 12
