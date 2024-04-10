@@ -1,7 +1,7 @@
 const bindings = require('bindings');
 
 const binding = bindings({
-  bindings: 'nbs_decoder',
+  bindings: 'nbsdecoder',
 });
 
 module.exports.NbsDecoder = binding.Decoder;

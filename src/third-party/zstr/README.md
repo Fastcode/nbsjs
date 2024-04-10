@@ -1,4 +1,4 @@
-# zstr: 1.0.5
+#zstr : 1.0.5
 
 Used for reading g-zipped files using an `ifstream`. Downloaded from https://github.com/mateidavid/zstr/releases/tag/v1.0.5, on 2 Mar 2022.
 

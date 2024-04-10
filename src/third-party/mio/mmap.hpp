@@ -94,7 +94,7 @@ namespace mio {
          * This class has single-ownership semantics, so transferring ownership may only be
          * accomplished by moving the object.
          */
-        basic_mmap(basic_mmap&&) = default;
+        basic_mmap(basic_mmap&&)            = default;
         basic_mmap& operator=(basic_mmap&&) = default;
 
         /** The destructor invokes unmap. */

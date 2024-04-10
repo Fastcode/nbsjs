@@ -5,7 +5,7 @@
 #include <napi.h>
 
 #include "Packet.hpp"
-#include "zstr/zstr.hpp"
+#include "third-party/zstr/zstr.hpp"
 
 namespace nbs {
     class Encoder : public Napi::ObjectWrap<Encoder> {
