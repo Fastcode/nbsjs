@@ -1,6 +1,30 @@
 {
     "targets": [
         {
+            "target_name": "zlib",
+            "type": "static_library",
+            "sources": [
+                "src/third-party/zlib/adler32.c",
+                "src/third-party/zlib/compress.c",
+                "src/third-party/zlib/crc32.c",
+                "src/third-party/zlib/deflate.c",
+                "src/third-party/zlib/gzclose.c",
+                "src/third-party/zlib/gzlib.c",
+                "src/third-party/zlib/gzread.c",
+                "src/third-party/zlib/gzwrite.c",
+                "src/third-party/zlib/infback.c",
+                "src/third-party/zlib/inffast.c",
+                "src/third-party/zlib/inflate.c",
+                "src/third-party/zlib/inftrees.c",
+                "src/third-party/zlib/trees.c",
+                "src/third-party/zlib/uncompr.c",
+                "src/third-party/zlib/zutil.c",
+            ],
+        },
+        {
+            "dependencies": [
+                "zlib",
+            ],
             "target_name": "nbs_decoder",
             "sources": [
                 "src/binding.cpp",
@@ -9,11 +33,12 @@
                 "src/Hash.cpp",
                 "src/Packet.cpp",
                 "src/Timestamp.cpp",
-                "src/xxhash/xxhash.c",
+                "src/third-party/xxhash/xxhash.c",
             ],
             "cflags": [],
             "include_dirs": [
                 "<!@(node -p \"require('node-addon-api').include\")",
+                "src/third-party/zlib",
             ],
             "defines": [
                 # Restrict NAPI to v6 (to support Node v10)
@@ -63,12 +88,6 @@
                     'OS=="win"',
                     {
                         "defines": ["_HAS_EXCEPTIONS=1", "NOMINMAX=1"],
-                        "libraries": [
-                            "-l<(module_root_dir)/src/zlib/lib/zlib_a.lib",
-                        ],
-                        "include_dirs": [
-                            "-l<(module_root_dir)/src/zlib/include",
-                        ],
                         "msvs_settings": {
                             "VCCLCompilerTool": {
                                 "AdditionalOptions": ["-std:c++14"],
@@ -77,6 +96,6 @@
                     },
                 ],
             ],
-        }
-    ]
+        },
+    ],
 }
