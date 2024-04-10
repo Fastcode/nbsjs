@@ -1,34 +1,6 @@
 {
     "targets": [
         {
-            "target_name": "zlib",
-            "type": "static_library",
-            "cflags!": ["-Werror"],
-            "cflags": ["-Wno-error"],
-            "cflags_cc!": ["-Werror"],
-            "cflags_cc": ["-Wno-error"],
-            "sources": [
-                "src/third-party/zlib/adler32.c",
-                "src/third-party/zlib/compress.c",
-                "src/third-party/zlib/crc32.c",
-                "src/third-party/zlib/deflate.c",
-                "src/third-party/zlib/gzclose.c",
-                "src/third-party/zlib/gzlib.c",
-                "src/third-party/zlib/gzread.c",
-                "src/third-party/zlib/gzwrite.c",
-                "src/third-party/zlib/infback.c",
-                "src/third-party/zlib/inffast.c",
-                "src/third-party/zlib/inflate.c",
-                "src/third-party/zlib/inftrees.c",
-                "src/third-party/zlib/trees.c",
-                "src/third-party/zlib/uncompr.c",
-                "src/third-party/zlib/zutil.c",
-            ],
-        },
-        {
-            "dependencies": [
-                "zlib",
-            ],
             "target_name": "nbsdecoder",
             "sources": [
                 "src/binding.cpp",
@@ -39,9 +11,9 @@
                 "src/Timestamp.cpp",
                 "src/third-party/xxhash/xxhash.c",
             ],
+            "cflags": [],
             "include_dirs": [
                 "<!@(node -p \"require('node-addon-api').include\")",
-                "src/third-party/zlib",
             ],
             "defines": [
                 # Restrict NAPI to v6 (to support Node v10)
@@ -90,6 +62,10 @@
                 [
                     'OS=="win"',
                     {
+                        "dependencies": ["zlib"],
+                        "include_dirs": [
+                            "src/third-party/zlib",
+                        ],
                         "defines": ["_HAS_EXCEPTIONS=1", "NOMINMAX=1"],
                         "msvs_settings": {
                             "VCCLCompilerTool": {
@@ -100,5 +76,34 @@
                 ],
             ],
         },
+    ],
+    "conditions": [
+        ['OS == "win"', {
+            "targets": [
+                # Compile zlib for linking on Windows only
+                {
+                    "target_name": "zlib",
+                    "type": "static_library",
+                    "dependencies": [],
+                    "sources": [
+                        "src/third-party/zlib/adler32.c",
+                        "src/third-party/zlib/compress.c",
+                        "src/third-party/zlib/crc32.c",
+                        "src/third-party/zlib/deflate.c",
+                        "src/third-party/zlib/gzclose.c",
+                        "src/third-party/zlib/gzlib.c",
+                        "src/third-party/zlib/gzread.c",
+                        "src/third-party/zlib/gzwrite.c",
+                        "src/third-party/zlib/infback.c",
+                        "src/third-party/zlib/inffast.c",
+                        "src/third-party/zlib/inflate.c",
+                        "src/third-party/zlib/inftrees.c",
+                        "src/third-party/zlib/trees.c",
+                        "src/third-party/zlib/uncompr.c",
+                        "src/third-party/zlib/zutil.c",
+                    ],
+                },
+            ],
+        }],
     ],
 }
