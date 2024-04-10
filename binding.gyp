@@ -4,7 +4,6 @@
             "target_name": "zlib",
             "type": "static_library",
             "cflags!": ["-Werror"],
-            "cflags_cc!": ["-Werror"],
             "sources": [
                 "src/third-party/zlib/adler32.c",
                 "src/third-party/zlib/compress.c",
@@ -37,7 +36,7 @@
                 "src/Timestamp.cpp",
                 "src/third-party/xxhash/xxhash.c",
             ],
-            "cflags": [],
+            "cflags!": ["-Werror"],
             "include_dirs": [
                 "<!@(node -p \"require('node-addon-api').include\")",
                 "src/third-party/zlib",
