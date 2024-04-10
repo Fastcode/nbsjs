@@ -25,7 +25,7 @@
             "dependencies": [
                 "zlib",
             ],
-            "target_name": "nbs_decoder",
+            "target_name": "nbsdecoder",
             "sources": [
                 "src/binding.cpp",
                 "src/Decoder.cpp",
