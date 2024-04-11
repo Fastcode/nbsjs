@@ -3,7 +3,7 @@
 
 #include <napi.h>
 
-#include "xxhash/xxhash.h"
+#include "third-party/xxhash/xxhash.h"
 
 namespace nbs {
 

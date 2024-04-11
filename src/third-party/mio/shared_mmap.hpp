@@ -56,11 +56,11 @@ namespace mio {
         using handle_type            = typename impl_type::handle_type;
         using mmap_type              = impl_type;
 
-        basic_shared_mmap()                         = default;
-        basic_shared_mmap(const basic_shared_mmap&) = default;
+        basic_shared_mmap()                                    = default;
+        basic_shared_mmap(const basic_shared_mmap&)            = default;
         basic_shared_mmap& operator=(const basic_shared_mmap&) = default;
         basic_shared_mmap(basic_shared_mmap&&)                 = default;
-        basic_shared_mmap& operator=(basic_shared_mmap&&) = default;
+        basic_shared_mmap& operator=(basic_shared_mmap&&)      = default;
 
         /** Takes ownership of an existing mmap object. */
         basic_shared_mmap(mmap_type&& mmap) : pimpl_(std::make_shared<mmap_type>(std::move(mmap))) {}

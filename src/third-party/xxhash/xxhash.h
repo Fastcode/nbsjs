@@ -93,21 +93,21 @@ typedef enum { XXH_OK = 0, XXH_ERROR } XXH_errorcode;
  *  It's not useful to compile and link it as a separate module.
  */
 #if defined(XXH_INLINE_ALL) || defined(XXH_PRIVATE_API)
-#    ifndef XXH_STATIC_LINKING_ONLY
-#        define XXH_STATIC_LINKING_ONLY
-#    endif
-#    if defined(__GNUC__)
-#        define XXH_PUBLIC_API static __inline __attribute__((unused))
-#    elif defined(__cplusplus) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 */)
-#        define XXH_PUBLIC_API static inline
-#    elif defined(_MSC_VER)
-#        define XXH_PUBLIC_API static __inline
-#    else
-/* this version may generate warnings for unused static functions */
-#        define XXH_PUBLIC_API static
-#    endif
+    #ifndef XXH_STATIC_LINKING_ONLY
+        #define XXH_STATIC_LINKING_ONLY
+    #endif
+    #if defined(__GNUC__)
+        #define XXH_PUBLIC_API static __inline __attribute__((unused))
+    #elif defined(__cplusplus) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 */)
+        #define XXH_PUBLIC_API static inline
+    #elif defined(_MSC_VER)
+        #define XXH_PUBLIC_API static __inline
+    #else
+        /* this version may generate warnings for unused static functions */
+        #define XXH_PUBLIC_API static
+    #endif
 #else
-#    define XXH_PUBLIC_API /* do nothing */
+    #define XXH_PUBLIC_API /* do nothing */
 #endif                     /* XXH_INLINE_ALL || XXH_PRIVATE_API */
 
 /*! XXH_NAMESPACE, aka Namespace Emulation :
@@ -122,37 +122,37 @@ typedef enum { XXH_OK = 0, XXH_ERROR } XXH_errorcode;
  * regular symbol name will be automatically translated by this header.
  */
 #ifdef XXH_NAMESPACE
-#    define XXH_CAT(A, B) A##B
-#    define XXH_NAME2(A, B) XXH_CAT(A, B)
-#    define XXH_versionNumber XXH_NAME2(XXH_NAMESPACE, XXH_versionNumber)
-#    define XXH32 XXH_NAME2(XXH_NAMESPACE, XXH32)
-#    define XXH32_createState XXH_NAME2(XXH_NAMESPACE, XXH32_createState)
-#    define XXH32_freeState XXH_NAME2(XXH_NAMESPACE, XXH32_freeState)
-#    define XXH32_reset XXH_NAME2(XXH_NAMESPACE, XXH32_reset)
-#    define XXH32_update XXH_NAME2(XXH_NAMESPACE, XXH32_update)
-#    define XXH32_digest XXH_NAME2(XXH_NAMESPACE, XXH32_digest)
-#    define XXH32_copyState XXH_NAME2(XXH_NAMESPACE, XXH32_copyState)
-#    define XXH32_canonicalFromHash XXH_NAME2(XXH_NAMESPACE, XXH32_canonicalFromHash)
-#    define XXH32_hashFromCanonical XXH_NAME2(XXH_NAMESPACE, XXH32_hashFromCanonical)
-#    define XXH64 XXH_NAME2(XXH_NAMESPACE, XXH64)
-#    define XXH64_createState XXH_NAME2(XXH_NAMESPACE, XXH64_createState)
-#    define XXH64_freeState XXH_NAME2(XXH_NAMESPACE, XXH64_freeState)
-#    define XXH64_reset XXH_NAME2(XXH_NAMESPACE, XXH64_reset)
-#    define XXH64_update XXH_NAME2(XXH_NAMESPACE, XXH64_update)
-#    define XXH64_digest XXH_NAME2(XXH_NAMESPACE, XXH64_digest)
-#    define XXH64_copyState XXH_NAME2(XXH_NAMESPACE, XXH64_copyState)
-#    define XXH64_canonicalFromHash XXH_NAME2(XXH_NAMESPACE, XXH64_canonicalFromHash)
-#    define XXH64_hashFromCanonical XXH_NAME2(XXH_NAMESPACE, XXH64_hashFromCanonical)
+    #define XXH_CAT(A, B)           A##B
+    #define XXH_NAME2(A, B)         XXH_CAT(A, B)
+    #define XXH_versionNumber       XXH_NAME2(XXH_NAMESPACE, XXH_versionNumber)
+    #define XXH32                   XXH_NAME2(XXH_NAMESPACE, XXH32)
+    #define XXH32_createState       XXH_NAME2(XXH_NAMESPACE, XXH32_createState)
+    #define XXH32_freeState         XXH_NAME2(XXH_NAMESPACE, XXH32_freeState)
+    #define XXH32_reset             XXH_NAME2(XXH_NAMESPACE, XXH32_reset)
+    #define XXH32_update            XXH_NAME2(XXH_NAMESPACE, XXH32_update)
+    #define XXH32_digest            XXH_NAME2(XXH_NAMESPACE, XXH32_digest)
+    #define XXH32_copyState         XXH_NAME2(XXH_NAMESPACE, XXH32_copyState)
+    #define XXH32_canonicalFromHash XXH_NAME2(XXH_NAMESPACE, XXH32_canonicalFromHash)
+    #define XXH32_hashFromCanonical XXH_NAME2(XXH_NAMESPACE, XXH32_hashFromCanonical)
+    #define XXH64                   XXH_NAME2(XXH_NAMESPACE, XXH64)
+    #define XXH64_createState       XXH_NAME2(XXH_NAMESPACE, XXH64_createState)
+    #define XXH64_freeState         XXH_NAME2(XXH_NAMESPACE, XXH64_freeState)
+    #define XXH64_reset             XXH_NAME2(XXH_NAMESPACE, XXH64_reset)
+    #define XXH64_update            XXH_NAME2(XXH_NAMESPACE, XXH64_update)
+    #define XXH64_digest            XXH_NAME2(XXH_NAMESPACE, XXH64_digest)
+    #define XXH64_copyState         XXH_NAME2(XXH_NAMESPACE, XXH64_copyState)
+    #define XXH64_canonicalFromHash XXH_NAME2(XXH_NAMESPACE, XXH64_canonicalFromHash)
+    #define XXH64_hashFromCanonical XXH_NAME2(XXH_NAMESPACE, XXH64_hashFromCanonical)
 #endif
 
 
 /* *************************************
  *  Version
  ***************************************/
-#define XXH_VERSION_MAJOR 0
-#define XXH_VERSION_MINOR 6
+#define XXH_VERSION_MAJOR   0
+#define XXH_VERSION_MINOR   6
 #define XXH_VERSION_RELEASE 5
-#define XXH_VERSION_NUMBER (XXH_VERSION_MAJOR * 100 * 100 + XXH_VERSION_MINOR * 100 + XXH_VERSION_RELEASE)
+#define XXH_VERSION_NUMBER  (XXH_VERSION_MAJOR * 100 * 100 + XXH_VERSION_MINOR * 100 + XXH_VERSION_RELEASE)
 XXH_PUBLIC_API unsigned XXH_versionNumber(void);
 
 
@@ -248,20 +248,20 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(const XXH64_canonical_t* src
 
 #ifdef XXH_STATIC_LINKING_ONLY
 
-/* ================================================================================================
-   This section contains declarations which are not guaranteed to remain stable.
-   They may change in future versions, becoming incompatible with a different version of the library.
-   These declarations should only be used with static linking.
-   Never use them in association with dynamic linking !
-=================================================================================================== */
+    /* ================================================================================================
+       This section contains declarations which are not guaranteed to remain stable.
+       They may change in future versions, becoming incompatible with a different version of the library.
+       These declarations should only be used with static linking.
+       Never use them in association with dynamic linking !
+    =================================================================================================== */
 
-/* These definitions are only present to allow
- * static allocation of XXH state, on stack or in a struct for example.
- * Never **ever** use members directly. */
+    /* These definitions are only present to allow
+     * static allocation of XXH state, on stack or in a struct for example.
+     * Never **ever** use members directly. */
 
-#    if !defined(__VMS) \
+    #if !defined(__VMS) \
         && (defined(__cplusplus) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 */))
-#        include <stdint.h>
+        #include <stdint.h>
 
 struct XXH32_state_s {
     uint32_t total_len_32;
@@ -286,7 +286,7 @@ struct XXH64_state_s {
     uint32_t reserved[2]; /* never read nor write, might be removed in a future version */
 };                        /* typedef'd to XXH64_state_t */
 
-#    else
+    #else
 
 struct XXH32_state_s {
     unsigned total_len_32;
@@ -300,7 +300,7 @@ struct XXH32_state_s {
     unsigned reserved; /* never read nor write, might be removed in a future version */
 };                     /* typedef'd to XXH32_state_t */
 
-#        ifndef XXH_NO_LONG_LONG /* remove 64-bit support */
+        #ifndef XXH_NO_LONG_LONG /* remove 64-bit support */
 struct XXH64_state_s {
     unsigned long long total_len;
     unsigned long long v1;
@@ -311,14 +311,14 @@ struct XXH64_state_s {
     unsigned memsize;
     unsigned reserved[2]; /* never read nor write, might be removed in a future version */
 };                        /* typedef'd to XXH64_state_t */
-#        endif
+        #endif
 
-#    endif
+    #endif
 
 
-#    if defined(XXH_INLINE_ALL) || defined(XXH_PRIVATE_API)
-#        include "xxhash.c" /* include xxhash function bodies as `static`, for inlining */
-#    endif
+    #if defined(XXH_INLINE_ALL) || defined(XXH_PRIVATE_API)
+        #include "xxhash.c" /* include xxhash function bodies as `static`, for inlining */
+    #endif
 
 #endif /* XXH_STATIC_LINKING_ONLY */
 

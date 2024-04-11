@@ -7,7 +7,7 @@
 #include "Index.hpp"
 #include "Packet.hpp"
 #include "TypeSubtype.hpp"
-#include "mio/mmap.hpp"
+#include "third-party/mio/mmap.hpp"
 
 namespace nbs {
     class Decoder : public Napi::ObjectWrap<Decoder> {
