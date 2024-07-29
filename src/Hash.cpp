@@ -1,5 +1,6 @@
-
 #include "Hash.hpp"
+
+#include <stdexcept>
 
 namespace nbs {
 
