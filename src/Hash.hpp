@@ -1,6 +1,7 @@
 #ifndef HASH_HPP
 #define HASH_HPP
 
+#include <cstdint>
 #include <napi.h>
 
 #include "third-party/xxhash/xxhash.h"
