@@ -1,6 +1,8 @@
 
 #include "Timestamp.hpp"
 
+#include <stdexcept>
+
 namespace nbs {
 
     namespace timestamp {
