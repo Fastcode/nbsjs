@@ -108,8 +108,8 @@ namespace nbs {
 
         auto path = info[0].As<Napi::String>().Utf8Value();
 
-        outputFile = std::make_unique<std::ofstream>(path);
-        indexFile  = std::make_unique<zstr::ofstream>(path + ".idx");
+        outputFile = std::make_unique<std::ofstream>(path, std::ios_base::binary);
+        indexFile  = std::make_unique<zstr::ofstream>(path + ".idx", std::ios_base::binary);
     }
 
     Napi::Value Encoder::Write(const Napi::CallbackInfo& info) {

@@ -1,6 +1,8 @@
 
 #include "Packet.hpp"
 
+#include <stdexcept>
+
 namespace nbs {
 
     Packet Packet::FromJsValue(const Napi::Value& jsPacket, const Napi::Env& env) {
